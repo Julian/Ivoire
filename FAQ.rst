@@ -69,15 +69,6 @@ Python that do do the monkey patching, and if you look around you should be
 able to find one.
 
 
-Why didn't you build on top of more of the objects unittest already provides?
------------------------------------------------------------------------------
-
-It was quicker to prototype by building from scratch. If this has any success,
-things will ultimately be moved to be built more on top of ``unittest``, at
-least wherever that's feasible. (It's not feasible to use
-``unittest.TestCase.run`` for instance.)
-
-
 How come the README doesn't have some cool lineart in it?
 ---------------------------------------------------------
 

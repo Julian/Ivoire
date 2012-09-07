@@ -1,36 +1,82 @@
 from functools import wraps
-from unittest import TestCase
+from unittest import TestCase, TestResult, TestSuite
 
-from ivoire import describe
-from ivoire.tests.util import PatchMixin
-
-
-FAKE_MODULE, FAKE_PATH = "a_module", "a/path"
+from ivoire.standalone import Example, ExampleGroup, describe
+from ivoire.tests.util import PatchMixin, mock
 
 
-class TestDescribe(TestCase, PatchMixin):
-    def test_subject(self):
+class TestExampleGroup(TestCase, PatchMixin):
+    def setUp(self):
+        self.describes = ExampleGroup
+        self.it = ExampleGroup(self.describes)
+
+    def test_repr(self):
+        self.assertEqual(
+            repr(self.it),
+            "<{0.__class__.__name__} examples={0.examples}>".format(self.it)
+        )
+
+    def test_it_sets_the_described_object(self):
+        self.assertEqual(self.it.describes, self.describes)
+
+    def test_it_starts_and_stops_a_test_run(self):
+        result = self.patchObject(self.it, "result")
+
+        with self.it:
+            pass
+
+        self.assertEqual(
+            result.mock_calls,
+            [mock.call.startTestRun(), mock.call.stopTestRun()],
+        )
+
+    def test_describe(self):
+        self.assertEqual(describe, ExampleGroup)
+
+
+class TestDescribeTests(TestCase, PatchMixin):
+    def setUp(self):
         with describe(describe) as it:
-            self.assertEqual(it.subject, describe)
+            pass
+        self.it = it
 
-    def test_calling_adds_and_example(self):
-        with describe(describe) as it:
-            self.assertEqual(it.add_example, it.__call__)
+    def test_it_adds_an_example(self):
+        with self.it("does a thing") as test:
+            pass
+        self.assertEqual(self.it.examples, [test])
 
-    def test_adds_an_example(self):
-        with describe(describe) as it:
-            with it("adds an example") as test:
-                self.assertEqual(it.examples, ["adds an example"])
+    def test_iterating_yields_examples(self):
+        with self.it("does a thing") as test:
+            pass
+        self.assertEqual(list(self.it), self.it.examples)
 
-    def test_can_pass_a_test(self):
-        with describe(describe) as it:
-            with it("can pass") as test:
-                self.assertEqual(it.succeeded, {"can pass" : None})
-        self.assertEqual(it.succeeded, {"can pass" : True})
+    def test_it_passes_along_its_test_result_to_each_test(self):
+        result = self.patchObject(self.it, "result")
 
-    def test_can_fail_a_test(self):
-        with describe(describe) as it:
-            with it("can fail") as test:
-                self.assertEqual(it.succeeded, {"can fail" : None})
-                test.fail()
-        self.assertEqual(it.succeeded, {"can fail" : False})
+        with self.it("does a thing") as test:
+            run = self.patchObject(test, "run")
+        run.assert_called_once_with(result)
+
+        with self.it("does another thing") as test:
+            run = self.patchObject(test, "run")
+        run.assert_called_once_with(result)
+
+
+class TestExample(TestCase, PatchMixin):
+    def setUp(self):
+        self.name = "does a thing"
+        self.example = Example(self.name)
+
+    def test_it_knows_its_name(self):
+        self.assertEqual(self.example.name, self.name)
+
+    def test_repr(self):
+        self.assertEqual(
+            repr(self.example),
+            "<{0.__class__.__name__}: {0.name}>".format(self.example)
+        )
+
+    def test_hash(self):
+        self.assertEqual(
+            hash(self.example), hash((Example, self.example.name)),
+        )
