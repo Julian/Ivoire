@@ -14,7 +14,7 @@ standalone mode, you simply write some tests, mainly using ``ivoire.describe``
 (which serves the same purpose as its RSpec inspirer), and then execute them,
 either as a script, or with the yet-to-be-written ``ivoire`` runner.
 
-For instance:
+For instance, if you save the following example as ``example.py``:
 
 ::
 
@@ -29,7 +29,7 @@ For instance:
             return x / y
 
 
-    with describe(describe) as it:
+    with describe(Calculator) as it:
         with it("adds two numbers") as test:
             calculator = Calculator()
             test.assertEqual(calculator.add(2, 4), 6)
@@ -48,5 +48,5 @@ For instance:
             test.assertEqual(calculator.multiply(2, 3), 6)
 
 
-can be run with ``python test_example.py``, if you've saved it as such, and 
-will produce output for the tests it runs.
+then running it with ``python example.py`` will output a result for each of the
+tests.
