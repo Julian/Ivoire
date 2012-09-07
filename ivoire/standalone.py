@@ -1,7 +1,12 @@
 import collections
 import contextlib
+import sys
 
 from unittest import TestCase, TestResult, TestSuite
+
+
+class _ShouldStop(Exception):
+    pass
 
 
 # TestCase requires the name of an existing method on itself on creation,
@@ -23,25 +28,26 @@ class Example(TestCase):
     def __str__(self):
         return self.__name
 
-    def run(self, result):
-        result.startTest(self)
-        result.stopTest(self)
-
 
 class ExampleGroup(object):
 
-    TestResultClass = TestResult
+    DefaultExampleResult = TestResult
 
-    def __init__(self, describes):
+    def __init__(self, describes, failfast=False, DefaultExample=Example):
+        self.DefaultExample = DefaultExample
         self.describes = describes
         self.examples = []
-        self.result = self.TestResultClass()
+
+        self.result = self.DefaultExampleResult()
+        self.result.failfast = failfast
 
     def __enter__(self):
         self.result.startTestRun()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type == _ShouldStop:
+            return True
         self.result.stopTestRun()
 
     def __iter__(self):
@@ -54,10 +60,31 @@ class ExampleGroup(object):
 
     @contextlib.contextmanager
     def __call__(self, description):
-        example = Example(description)
+        example = self.DefaultExample(description)
+        self.add_example(example)
+        self.result.startTest(example)
+        try:
+            yield example
+        except KeyboardInterrupt:
+            raise
+        except example.failureException:
+            self.result.addFailure(example, sys.exc_info())
+        except:
+            self.result.addError(example, sys.exc_info())
+        else:
+            self.result.addSuccess(example)
+        finally:
+            example.doCleanups()
+            self.result.stopTest(example)
+
+            if self.result.shouldStop:
+                raise _ShouldStop
+
+    def add_example(self, example):
         self.examples.append(example)
-        yield example
-        example.run(self.result)
+
+    def countTestCases(self):
+        return sum(example.countTestCases() for example in self)
 
 
 describe = ExampleGroup

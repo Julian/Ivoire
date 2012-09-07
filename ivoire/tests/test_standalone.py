@@ -5,61 +5,117 @@ from ivoire.standalone import Example, ExampleGroup, describe
 from ivoire.tests.util import PatchMixin, mock
 
 
-class TestExampleGroup(TestCase, PatchMixin):
-    def setUp(self):
-        self.describes = ExampleGroup
-        self.it = ExampleGroup(self.describes)
-
-    def test_repr(self):
-        self.assertEqual(
-            repr(self.it),
-            "<{0.__class__.__name__} examples={0.examples}>".format(self.it)
-        )
-
-    def test_it_sets_the_described_object(self):
-        self.assertEqual(self.it.describes, self.describes)
-
-    def test_it_starts_and_stops_a_test_run(self):
-        result = self.patchObject(self.it, "result")
-
-        with self.it:
-            pass
-
-        self.assertEqual(
-            result.mock_calls,
-            [mock.call.startTestRun(), mock.call.stopTestRun()],
-        )
-
+class TestDescribeTests(TestCase, PatchMixin):
     def test_describe(self):
         self.assertEqual(describe, ExampleGroup)
 
+    def test_repr(self):
+        it = ExampleGroup(describe)
+        self.assertEqual(
+            repr(it),
+            "<{0.__class__.__name__} examples={0.examples}>".format(it)
+        )
 
-class TestDescribeTests(TestCase, PatchMixin):
-    def setUp(self):
-        with describe(describe) as it:
-            pass
-        self.it = it
+    def test_it_sets_the_described_object(self):
+        it = ExampleGroup(describe)
+        self.assertEqual(it.describes, describe)
+
+    def test_it_starts_and_stops_a_test_run(self):
+        it = ExampleGroup(describe)
+        result = self.patchObject(it, "result")
+        with it:
+            self.assertEqual(result.mock_calls, [mock.call.startTestRun()])
+        result.stopTestRun.assert_called_once_with()
 
     def test_it_adds_an_example(self):
-        with self.it("does a thing") as test:
-            pass
-        self.assertEqual(self.it.examples, [test])
+        with describe(describe) as it:
+            with it("does a thing") as test:
+                pass
+        self.assertEqual(it.examples, [test])
 
     def test_iterating_yields_examples(self):
-        with self.it("does a thing") as test:
+        with describe(describe) as it:
+            with it("does a thing") as test:
+                pass
+        self.assertEqual(list(it), it.examples)
+
+    def test_counts_its_examples(self):
+        with describe(describe) as it:
             pass
-        self.assertEqual(list(self.it), self.it.examples)
 
-    def test_it_passes_along_its_test_result_to_each_test(self):
-        result = self.patchObject(self.it, "result")
+        self.assertEqual(it.countTestCases(), 0)
+        it.add_example(mock.Mock(**{"countTestCases.return_value" : 3}))
+        self.assertEqual(it.countTestCases(), 3)
 
-        with self.it("does a thing") as test:
-            run = self.patchObject(test, "run")
-        run.assert_called_once_with(result)
+    def test_it_can_pass(self):
+        with describe(describe) as it:
+            result = self.patchObject(it, "result")
 
-        with self.it("does another thing") as test:
-            run = self.patchObject(test, "run")
-        run.assert_called_once_with(result)
+            with it("does a thing") as test:
+                pass
+
+            self.assertEqual(result.mock_calls, [
+                mock.call.startTest(test),
+                mock.call.addSuccess(test),
+                mock.call.stopTest(test),
+            ])
+
+    def test_it_can_fail(self):
+        with describe(describe) as it:
+            result = self.patchObject(it, "result")
+            exc = self.patch("ivoire.standalone.sys.exc_info").return_value
+
+            with it("does a thing") as test:
+                test.fail()
+
+            self.assertEqual(
+                result.mock_calls, [
+                    mock.call.startTest(test),
+                    mock.call.addFailure(test, exc),
+                    mock.call.stopTest(test),
+                ]
+            )
+
+    def test_it_can_error(self):
+        with describe(describe) as it:
+            result = self.patchObject(it, "result")
+            exc = self.patch("ivoire.standalone.sys.exc_info").return_value
+
+            with it("does a thing") as test:
+                raise IndexError()
+
+            self.assertEqual(
+                result.mock_calls, [
+                    mock.call.startTest(test),
+                    mock.call.addError(test, exc),
+                    mock.call.stopTest(test),
+                ]
+            )
+
+    def test_it_does_not_swallow_KeyboardInterrupts(self):
+        with self.assertRaises(KeyboardInterrupt):
+            with describe(describe) as it:
+                with it("does a thing") as test:
+                    raise KeyboardInterrupt
+
+    def test_it_runs_cleanups(self):
+        with describe(describe) as it:
+            with it("does a thing") as test:
+                doCleanups = self.patchObject(test, "doCleanups")
+            self.assertTrue(doCleanups.called)
+
+    def test_it_can_have_Example_specified(self):
+        class OtherExample(Example):
+            pass
+
+        with describe(describe, DefaultExample=OtherExample) as it:
+            self.assertEqual(it.DefaultExample, OtherExample)
+
+    def test_it_respects_fail_fast(self):
+        with describe(describe, failfast=True) as it:
+            with it("does a thing") as test:
+                test.fail()
+            self.fail("describe should have stopped after the first fail.")
 
 
 class TestExample(TestCase, PatchMixin):
