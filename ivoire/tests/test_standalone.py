@@ -68,15 +68,18 @@ class TestExample(TestCase, PatchMixin):
         self.example = Example(self.name)
 
     def test_it_knows_its_name(self):
-        self.assertEqual(self.example.name, self.name)
+        self.assertEqual(str(self.example), self.name)
 
     def test_repr(self):
         self.assertEqual(
             repr(self.example),
-            "<{0.__class__.__name__}: {0.name}>".format(self.example)
+            "<{0.__class__.__name__}: {0}>".format(self.example)
         )
 
-    def test_hash(self):
-        self.assertEqual(
-            hash(self.example), hash((Example, self.example.name)),
-        )
+    def test_same_name_has_the_same_hash(self):
+        same = Example(self.name)
+        self.assertEqual(hash(self.example), hash(same))
+
+    def test_different_name_has_a_different_hash(self):
+        other = Example("does a different thing")
+        self.assertNotEqual(hash(self.example), hash(other))

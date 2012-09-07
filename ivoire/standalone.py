@@ -12,13 +12,16 @@ _MAKE_UNITTEST_SHUT_UP = "__init__"
 class Example(TestCase):
     def __init__(self, name):
         super(Example, self).__init__(_MAKE_UNITTEST_SHUT_UP)
-        self.name = name
+        self.__name = name
 
     def __hash__(self):
-        return hash((self.__class__, self.name))
+        return hash((self.__class__, self.__name))
 
     def __repr__(self):
-        return "<{self.__class__.__name__}: {self.name}>".format(self=self)
+        return "<{self.__class__.__name__}: {self}>".format(self=self)
+
+    def __str__(self):
+        return self.__name
 
     def run(self, result):
         result.startTest(self)
