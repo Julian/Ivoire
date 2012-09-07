@@ -6,16 +6,15 @@ Ivoire
 you've never heard of RSpec, it's a Ruby library that is widely used, and has a
 slightly different twist on how tests should look.
 
-A small example
+A Small Example
 ---------------
 
 ``ivoire`` has two modes of operation: standalone mode and transform mode. In
-standalone mode, you simply write some tests, mainly using ``ivoire.describe``
-(which serves the same purpose as its RSpec inspirer), and then execute them,
-either as a script, or with the yet-to-be-written ``ivoire`` runner.
+standalone mode, you simply write some tests using ``ivoire.describe`` and then
+execute them with the included ``ivoire`` test runner.
 
-For instance, if you run the following spec (which can be found in
-``examples/calculator_spec.py`` if you'd like to run it yourself):
+For instance, if you run the following spec, the test output will appear on
+standard error.
 
 ::
 
@@ -49,4 +48,6 @@ For instance, if you run the following spec (which can be found in
             test.assertEqual(calculator.multiply(2, 3), 6)
 
 
-the output of each of the tests will appear on standard error.
+You can find this and other examples in the ``examples`` directory of the
+source checkout, and run them with ``ivoire examples/calculator_spec.py`` after
+you've installed ``ivoire``.
