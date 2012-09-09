@@ -110,6 +110,12 @@ class TestDescribeTests(TestCase, PatchMixin):
                 doCleanups = self.patchObject(test, "doCleanups")
             self.assertTrue(doCleanups.called)
 
+    def test_it_respects_shouldStop(self):
+        with self.it as it:
+            with it("does a thing") as test:
+                self.result.shouldStop = True
+            self.fail("describe should have stopped already!")
+
 
 class TestExample(TestCase, PatchMixin):
     def setUp(self):
