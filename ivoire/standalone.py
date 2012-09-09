@@ -1,8 +1,10 @@
+from __future__ import unicode_literals
+from unittest import TestCase, TestResult, TestSuite
 import collections
 import contextlib
 import sys
 
-from unittest import TestCase, TestResult, TestSuite
+from ivoire.result import IvoireResult
 
 
 class _ShouldStop(Exception):
@@ -40,14 +42,14 @@ class ExampleGroup(object):
 
     """
 
-    DefaultExampleResult = TestResult
+    DefaultResult = IvoireResult
 
     def __init__(self, describes, failfast=False, Example=Example):
         self.Example = Example
         self.describes = describes
         self.examples = []
 
-        self.result = self.DefaultExampleResult()
+        self.result = self.DefaultResult()
         self.result.failfast = failfast
 
     def __enter__(self):

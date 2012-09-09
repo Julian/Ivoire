@@ -1,46 +1,59 @@
+from __future__ import unicode_literals
 from functools import wraps
-from unittest import TestCase, TestResult, TestSuite
+from unittest import TestCase
 
 from ivoire.standalone import Example, ExampleGroup, describe
 from ivoire.tests.util import PatchMixin, mock
 
 
-class TestDescribeTests(TestCase, PatchMixin):
+class TestDescribe(TestCase):
     def test_describe(self):
         self.assertEqual(describe, ExampleGroup)
 
+    def test_it_can_have_Example_specified(self):
+        OtherExample = mock.Mock()
+        it = ExampleGroup(describe, Example=OtherExample)
+        self.assertEqual(it.Example, OtherExample)
+
+    def test_it_respects_fail_fast(self):
+        it = ExampleGroup(describe, failfast=True)
+        self.assertTrue(it.result.failfast)
+
+
+class TestDescribeTests(TestCase, PatchMixin):
+    def setUp(self):
+        self.describes = ExampleGroup
+        self.it = ExampleGroup(self.describes)
+        self.result = self.patchObject(self.it, "result", shouldStop=False)
+
     def test_repr(self):
-        it = ExampleGroup(describe)
         self.assertEqual(
-            repr(it),
-            "<{0.__class__.__name__} examples={0.examples}>".format(it)
+            repr(self.it),
+            "<{0.__class__.__name__} examples={0.examples}>".format(self.it)
         )
 
     def test_it_sets_the_described_object(self):
-        it = ExampleGroup(describe)
-        self.assertEqual(it.describes, describe)
+        self.assertEqual(self.it.describes, self.describes)
 
     def test_it_starts_and_stops_a_test_run(self):
-        it = ExampleGroup(describe)
-        result = self.patchObject(it, "result")
-        with it:
-            self.assertEqual(result.mock_calls, [mock.call.startTestRun()])
-        result.stopTestRun.assert_called_once_with()
+        with self.it:
+            self.result.startTestRun.assert_called_once_with()
+        self.result.stopTestRun.assert_called_once_with()
 
     def test_it_adds_an_example(self):
-        with describe(describe) as it:
+        with self.it as it:
             with it("does a thing") as test:
                 pass
         self.assertEqual(it.examples, [test])
 
     def test_iterating_yields_examples(self):
-        with describe(describe) as it:
+        with self.it as it:
             with it("does a thing") as test:
                 pass
         self.assertEqual(list(it), it.examples)
 
     def test_counts_its_examples(self):
-        with describe(describe) as it:
+        with self.it as it:
             pass
 
         self.assertEqual(it.countTestCases(), 0)
@@ -48,75 +61,54 @@ class TestDescribeTests(TestCase, PatchMixin):
         self.assertEqual(it.countTestCases(), 3)
 
     def test_it_can_pass(self):
-        with describe(describe) as it:
-            result = self.patchObject(it, "result", shouldStop=False)
-
+        with self.it as it:
             with it("does a thing") as test:
                 pass
 
-            self.assertEqual(result.mock_calls, [
-                mock.call.startTest(test),
-                mock.call.addSuccess(test),
-                mock.call.stopTest(test),
-            ])
+        self.result.assert_has_calls([
+            mock.call.startTest(test),
+            mock.call.addSuccess(test),
+            mock.call.stopTest(test),
+        ])
 
 
     def test_it_can_fail(self):
-        with describe(describe) as it:
-            result = self.patchObject(it, "result", shouldStop=False)
+        with self.it as it:
             exc = self.patch("ivoire.standalone.sys.exc_info").return_value
 
             with it("does a thing") as test:
                 test.fail()
 
-            self.assertEqual(
-                result.mock_calls, [
-                    mock.call.startTest(test),
-                    mock.call.addFailure(test, exc),
-                    mock.call.stopTest(test),
-                ]
-            )
+        self.result.assert_has_calls([
+                mock.call.startTest(test),
+                mock.call.addFailure(test, exc),
+                mock.call.stopTest(test),
+        ])
 
     def test_it_can_error(self):
-        with describe(describe) as it:
-            result = self.patchObject(it, "result", shouldStop=False)
+        with self.it as it:
             exc = self.patch("ivoire.standalone.sys.exc_info").return_value
 
             with it("does a thing") as test:
                 raise IndexError()
 
-            self.assertEqual(
-                result.mock_calls, [
-                    mock.call.startTest(test),
-                    mock.call.addError(test, exc),
-                    mock.call.stopTest(test),
-                ]
-            )
+        self.result.assert_has_calls([
+                mock.call.startTest(test),
+                mock.call.addError(test, exc),
+                mock.call.stopTest(test),
+        ])
 
     def test_it_does_not_swallow_KeyboardInterrupts(self):
         with self.assertRaises(KeyboardInterrupt):
-            with describe(describe) as it:
+            with self.it as it:
                 with it("does a thing") as test:
                     raise KeyboardInterrupt
 
     def test_it_runs_cleanups(self):
-        with describe(describe) as it:
+        with self.it as it:
             with it("does a thing") as test:
                 doCleanups = self.patchObject(test, "doCleanups")
             self.assertTrue(doCleanups.called)
-
-    def test_it_can_have_Example_specified(self):
-        class OtherExample(Example):
-            pass
-
-        with describe(describe, Example=OtherExample) as it:
-            self.assertEqual(it.Example, OtherExample)
-
-    def test_it_respects_fail_fast(self):
-        with describe(describe, failfast=True) as it:
-            with it("does a thing") as test:
-                test.fail()
-            self.fail("describe should have stopped after the first fail.")
 
 
 class TestExample(TestCase, PatchMixin):
