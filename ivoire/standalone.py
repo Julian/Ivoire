@@ -15,6 +15,11 @@ _MAKE_UNITTEST_SHUT_UP = "__init__"
 
 
 class Example(TestCase):
+    """
+    An ``Example`` is the smallest unit in a specification.
+
+    """
+
     def __init__(self, name):
         super(Example, self).__init__(_MAKE_UNITTEST_SHUT_UP)
         self.__name = name
@@ -30,11 +35,15 @@ class Example(TestCase):
 
 
 class ExampleGroup(object):
+    """
+    ``ExampleGroup``s group together a number of ``Example``s.
+
+    """
 
     DefaultExampleResult = TestResult
 
-    def __init__(self, describes, failfast=False, DefaultExample=Example):
-        self.DefaultExample = DefaultExample
+    def __init__(self, describes, failfast=False, Example=Example):
+        self.Example = Example
         self.describes = describes
         self.examples = []
 
@@ -60,7 +69,12 @@ class ExampleGroup(object):
 
     @contextlib.contextmanager
     def __call__(self, description):
-        example = self.DefaultExample(description)
+        """
+        Construct and return a new ``Example``.
+
+        """
+
+        example = self.Example(description)
         self.add_example(example)
         self.result.startTest(example)
         try:
@@ -81,6 +95,11 @@ class ExampleGroup(object):
                 raise _ShouldStop
 
     def add_example(self, example):
+        """
+        Add an existing ``Example`` to this group.
+
+        """
+
         self.examples.append(example)
 
     def countTestCases(self):

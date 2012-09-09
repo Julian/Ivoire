@@ -15,6 +15,17 @@ I think the latter is also a good demo of what you can do with import hooks
 (path hooks), which can be confusing or magick-y but hopefully also do some
 good.
 
+To be a bit more specific, I like the renaming and refocusing that BDD tries to
+promote, and that's a thing that just adding new vocabulary like ``describe``
+and ``it`` can accomplish in a small way. That being said, Python isn't
+as suited for writing DSLs in it's own syntax as much as Ruby is.
+
+In ``Ivoire``'s standalone mode this means that tests suffer from some pretty
+big problems if you're not careful: Since ``with`` statements don't introduce
+new scopes, your tests aren't isolated at the language level from each other.
+So be careful. This is a non-issue in transformation mode, thankfully (though
+that has other smaller disadvantages).
+
 
 Why does it only support transformation in Python 3.3?
 ------------------------------------------------------

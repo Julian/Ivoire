@@ -49,7 +49,7 @@ class TestDescribeTests(TestCase, PatchMixin):
 
     def test_it_can_pass(self):
         with describe(describe) as it:
-            result = self.patchObject(it, "result")
+            result = self.patchObject(it, "result", shouldStop=False)
 
             with it("does a thing") as test:
                 pass
@@ -60,9 +60,10 @@ class TestDescribeTests(TestCase, PatchMixin):
                 mock.call.stopTest(test),
             ])
 
+
     def test_it_can_fail(self):
         with describe(describe) as it:
-            result = self.patchObject(it, "result")
+            result = self.patchObject(it, "result", shouldStop=False)
             exc = self.patch("ivoire.standalone.sys.exc_info").return_value
 
             with it("does a thing") as test:
@@ -78,7 +79,7 @@ class TestDescribeTests(TestCase, PatchMixin):
 
     def test_it_can_error(self):
         with describe(describe) as it:
-            result = self.patchObject(it, "result")
+            result = self.patchObject(it, "result", shouldStop=False)
             exc = self.patch("ivoire.standalone.sys.exc_info").return_value
 
             with it("does a thing") as test:
@@ -108,8 +109,8 @@ class TestDescribeTests(TestCase, PatchMixin):
         class OtherExample(Example):
             pass
 
-        with describe(describe, DefaultExample=OtherExample) as it:
-            self.assertEqual(it.DefaultExample, OtherExample)
+        with describe(describe, Example=OtherExample) as it:
+            self.assertEqual(it.Example, OtherExample)
 
     def test_it_respects_fail_fast(self):
         with describe(describe, failfast=True) as it:
