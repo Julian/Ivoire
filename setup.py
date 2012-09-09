@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 import os.path
 
 from ivoire import __version__
@@ -29,6 +29,7 @@ classifiers = [
 setup(
     name="ivoire",
     version=__version__,
+    entry_points={"console_scripts" : ["ivoire = ivoire.run:main"]},
     packages=["ivoire", "ivoire.tests"],
     author="Julian Berman",
     author_email="Julian@GrayVines.com",
