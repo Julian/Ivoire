@@ -114,7 +114,7 @@ class TestDescribeTests(TestCase, PatchMixin):
         with self.it as it:
             with it("does a thing") as test:
                 self.result.shouldStop = True
-            self.fail("describe should have stopped already!")
+            self.fail("should have stopped already!")  # pragma: no cover
 
 
 class TestExample(TestCase, PatchMixin):
