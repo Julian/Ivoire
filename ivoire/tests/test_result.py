@@ -3,24 +3,23 @@ from io import FileIO, StringIO
 from unittest import TestCase
 import sys
 
-from ivoire.result import IvoireResult
+from ivoire import result
 from ivoire.tests.util import PatchMixin, mock
 
 
 class TestIvoireResult(TestCase, PatchMixin):
     def test_writes_to_stderr_by_default(self):
-        self.assertEqual(IvoireResult().stream, sys.stderr)
+        self.assertEqual(result.IvoireResult().stream, sys.stderr)
 
     def test_default_is_color(self):
-        result = IvoireResult()
-        self.assertTrue(result.colored)
+        self.assertTrue(result.IvoireResult().colored)
 
 
 class TestIvoireResultOutput(TestCase, PatchMixin):
     def setUp(self):
         self.stream = StringIO()
         self.flush = self.patchObject(self.stream, "flush")
-        self.result = IvoireResult(self.stream)
+        self.result = result.IvoireResult(self.stream)
         self.test = mock.Mock()
 
         try:
@@ -44,3 +43,35 @@ class TestIvoireResultOutput(TestCase, PatchMixin):
         self.result.addError(self.test, self.exc_info)
         self.result.addFailure(self.test, self.exc_info)
         self.assertEqual(self.stream.getvalue(), ".EF")
+
+    def test_shows_colored_success_statistics(self):
+        self.result.colored = True
+        start, end = .123456, 1.123456
+        self.patchObject(result.time, "time", side_effect=[start, end])
+        self.result.startTestRun()
+        self.result.testsRun = 4
+        self.result.stopTestRun()
+        self.assertEqual(
+            self.stream.getvalue(),
+            "\n\nFinished in {:.6f} seconds.\n\n"
+            "\x1b[32m4 examples, 0 errors, 0 failures\x1b[0m\n".format(
+                end - start,
+            )
+        )
+
+    def test_shows_colored_failure_statistics(self):
+        self.result.colored = True
+        start, end = .123456, 1.123456
+        self.patchObject(result.time, "time", side_effect=[start, end])
+        self.result.startTestRun()
+        self.result.testsRun = 4
+        self.result.failures = range(1)
+        self.result.errors = range(2)
+        self.result.stopTestRun()
+        self.assertEqual(
+            self.stream.getvalue(),
+            "\n\nFinished in {:.6f} seconds.\n\n"
+            "\x1b[31m4 examples, 2 errors, 1 failure\x1b[0m\n".format(
+                end - start,
+            )
+        )
