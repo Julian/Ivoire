@@ -6,6 +6,7 @@ Ivoire
 you've never heard of RSpec, it's a Ruby library that is widely used, and has a
 slightly different twist on how tests should look.
 
+
 A Small Example
 ---------------
 
@@ -51,3 +52,26 @@ standard error.
 You can find this and other examples in the ``examples`` directory of the
 source checkout, and run them with ``ivoire examples/calculator_spec.py`` after
 you've installed ``ivoire``.
+
+
+Running the Test Suite
+----------------------
+
+You can run ``Ivoire``'s test suite by running ``tox`` in the root of the
+repository checkout, or by running ``YourFavoriteTestRunner ivoire``.
+
+You need to have ``tox`` installed via your package manager or with
+``pip install tox`` for the former.
+
+
+Contributing
+------------
+
+``Ivoire`` is developed on `GitHub <http://github.com/Julian/Ivoire>`_.
+
+Feel free to fork and submit patches or feature requests, your contributions
+are most welcome!
+
+If you'd like the best chance for them to be merged quickly try to include
+tests with your pull request, and adhere to general Python coding standards and
+your own common sense :).
