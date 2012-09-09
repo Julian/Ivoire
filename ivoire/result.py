@@ -44,6 +44,13 @@ class IvoireResult(TestResult):
         self.stream.flush()
 
     def stopTestRun(self):
+        if self.failures:
+            self.stream.write("\n\nFailures:\n\n")
+            self.stream.write("\n\n".join(fail for _, fail in self.failures))
+        if self.errors:
+            self.stream.write("\n\nErrors:\n\n")
+            self.stream.write("\n\n".join(error for _, error in self.errors))
+
         self.stream.write(
             "\n\nFinished in {:.6f} seconds.\n".format(
                 time.time() - self._start_time,
@@ -68,6 +75,9 @@ class IvoireResult(TestResult):
             run, errors, failures, *pluralize
         )
 
-        if self.wasSuccessful():
-            return green(output).join("\n\n")
-        return red(output).join("\n\n")
+        if self.colored:
+            if self.wasSuccessful():
+                output = green(output)
+            else:
+                output = red(output)
+        return output.join("\n\n")

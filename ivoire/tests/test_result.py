@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from io import FileIO, StringIO
+from textwrap import dedent
 from unittest import TestCase
 import sys
 
@@ -44,6 +45,23 @@ class TestIvoireResultOutput(TestCase, PatchMixin):
         self.result.addFailure(self.test, self.exc_info)
         self.assertEqual(self.stream.getvalue(), ".EF")
 
+    def test_shows_uncolored_statistics(self):
+        self.result.colored = False
+        start, end = .123456, 1.123456
+        self.patchObject(result.time, "time", side_effect=[start, end])
+        self.result.startTestRun()
+        self.result.testsRun = 4
+        self.result.stopTestRun()
+        self.assertEqual(
+            self.stream.getvalue(), dedent("""
+
+            Finished in {:.6f} seconds.
+
+            4 examples, 0 errors, 0 failures
+            """.format(end - start)
+            )
+        )
+
     def test_shows_colored_success_statistics(self):
         self.result.colored = True
         start, end = .123456, 1.123456
@@ -52,10 +70,12 @@ class TestIvoireResultOutput(TestCase, PatchMixin):
         self.result.testsRun = 4
         self.result.stopTestRun()
         self.assertEqual(
-            self.stream.getvalue(),
-            "\n\nFinished in {:.6f} seconds.\n\n"
-            "\x1b[32m4 examples, 0 errors, 0 failures\x1b[0m\n".format(
-                end - start,
+            self.stream.getvalue(), dedent("""
+
+            Finished in {:.6f} seconds.
+
+            \x1b[32m4 examples, 0 errors, 0 failures\x1b[0m
+            """.format(end - start)
             )
         )
 
@@ -65,13 +85,27 @@ class TestIvoireResultOutput(TestCase, PatchMixin):
         self.patchObject(result.time, "time", side_effect=[start, end])
         self.result.startTestRun()
         self.result.testsRun = 4
-        self.result.failures = range(1)
-        self.result.errors = range(2)
+        failures = self.result.failures = [("foo's name", "foo")]
+        errors = self.result.errors = [
+            ("bar's name", "bar"), ("baz's name", "baz")
+        ]
         self.result.stopTestRun()
         self.assertEqual(
-            self.stream.getvalue(),
-            "\n\nFinished in {:.6f} seconds.\n\n"
-            "\x1b[31m4 examples, 2 errors, 1 failure\x1b[0m\n".format(
-                end - start,
+            self.stream.getvalue(), dedent("""
+
+            Failures:
+
+            foo
+
+            Errors:
+
+            bar
+
+            baz
+
+            Finished in {:.6f} seconds.
+
+            \x1b[31m4 examples, 2 errors, 1 failure\x1b[0m
+            """.format(end - start)
             )
         )
