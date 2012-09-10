@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from io import FileIO, StringIO
+from io import StringIO
 from textwrap import dedent
 from unittest import TestCase
 import sys
@@ -8,104 +8,154 @@ from ivoire import result
 from ivoire.tests.util import PatchMixin, mock
 
 
-class TestIvoireResult(TestCase, PatchMixin):
-    def test_writes_to_stderr_by_default(self):
-        self.assertEqual(result.IvoireResult().stream, sys.stderr)
+def fake_exc_info():
+    try:
+        raise Exception("Used to construct exc_info")
+    except Exception:
+        return sys.exc_info()
 
-    def test_default_is_color(self):
-        self.assertTrue(result.IvoireResult().colored)
 
-
-class TestIvoireResultOutput(TestCase, PatchMixin):
+class TestExampleResult(TestCase, PatchMixin):
     def setUp(self):
-        self.stream = StringIO()
-        self.flush = self.patchObject(self.stream, "flush")
-        self.result = result.IvoireResult(self.stream)
+        self.formatter = mock.Mock()
+        self.result = result.ExampleResult(self.formatter)
         self.test = mock.Mock()
+        self.exc_info = fake_exc_info()
 
-        try:
-            raise Exception
-        except Exception:
-            self.exc_info = sys.exc_info()
+    def assertShown(self, output):
+        self.formatter.show.assert_has_call(output)
 
-    def test_colored_output(self):
-        self.result.colored = True
+    def test_times_the_run(self):
+        start, end = [1.234567, 8.9101112]
+        self.patchObject(result.time, "time", side_effect=[start, end])
+
+        self.result.startTestRun()
+        self.result.stopTestRun()
+
+        self.assertEqual(self.result.elapsed, end - start)
+
+    def test_shows_successes(self):
         self.result.addSuccess(self.test)
+        self.formatter.success.assert_called_once_with(self.test)
+        self.assertShown(self.formatter.success.return_value)
+
+    def test_shows_errors(self):
         self.result.addError(self.test, self.exc_info)
+        self.formatter.error.assert_called_once_with(self.test, self.exc_info)
+        self.assertShown(self.formatter.error.return_value)
+
+    def test_shows_failures(self):
         self.result.addFailure(self.test, self.exc_info)
-        self.assertEqual(
-            self.stream.getvalue(),
-            "\x1b[32m.\x1b[0m\x1b[31mE\x1b[0m\x1b[31mF\x1b[0m",
+        self.formatter.failure.assert_called_once_with(
+            self.test, self.exc_info
         )
+        self.assertShown(self.formatter.failure.return_value)
 
-    def test_uncolored_output(self):
-        self.result.colored = False
-        self.result.addSuccess(self.test)
-        self.result.addError(self.test, self.exc_info)
-        self.result.addFailure(self.test, self.exc_info)
-        self.assertEqual(self.stream.getvalue(), ".EF")
-
-    def test_shows_uncolored_statistics(self):
-        self.result.colored = False
-        start, end = .123456, 1.123456
-        self.patchObject(result.time, "time", side_effect=[start, end])
+    def test_show_statistics(self):
         self.result.startTestRun()
-        self.result.testsRun = 4
         self.result.stopTestRun()
+
+        self.formatter.timing.assert_called_once_with(self.result.elapsed)
+        self.assertShown(self.formatter.timing.return_value)
+
+        self.formatter.result.assert_called_once_with(self.result)
+        self.assertShown(self.formatter.result.return_value)
+
+
+class TestColored(TestCase, PatchMixin):
+    def setUp(self):
+        self.exc_info = mock.Mock()
+        self.formatter = mock.Mock()
+        self.result = mock.Mock()
+        self.test = mock.Mock()
+        self.colored = result.Colored(self.formatter)
+
+    def test_it_delegates_to_the_formatter(self):
+        self.assertEqual(self.colored.foo, self.formatter.foo)
+
+    def test_it_can_color_things(self):
         self.assertEqual(
-            self.stream.getvalue(), dedent("""
-
-            Finished in {:.6f} seconds.
-
-            4 examples, 0 errors, 0 failures
-            """.format(end - start)
-            )
+            self.colored.color("green", "hello"),
+            self.colored.ANSI["green"] + "hello" + self.colored.ANSI["reset"],
         )
 
-    def test_shows_colored_success_statistics(self):
-        self.result.colored = True
-        start, end = .123456, 1.123456
-        self.patchObject(result.time, "time", side_effect=[start, end])
-        self.result.startTestRun()
-        self.result.testsRun = 4
-        self.result.stopTestRun()
+    def test_it_colors_successes_green(self):
+        self.formatter.success.return_value = "S"
         self.assertEqual(
-            self.stream.getvalue(), dedent("""
-
-            Finished in {:.6f} seconds.
-
-            \x1b[32m4 examples, 0 errors, 0 failures\x1b[0m
-            """.format(end - start)
-            )
+            self.colored.success(self.test), self.colored.color("green", "S"),
         )
 
-    def test_shows_colored_failure_statistics(self):
-        self.result.colored = True
-        start, end = .123456, 1.123456
-        self.patchObject(result.time, "time", side_effect=[start, end])
-        self.result.startTestRun()
-        self.result.testsRun = 4
-        failures = self.result.failures = [("foo's name", "foo")]
-        errors = self.result.errors = [
-            ("bar's name", "bar"), ("baz's name", "baz")
-        ]
-        self.result.stopTestRun()
+    def test_it_colors_failures_red(self):
+        self.formatter.failure.return_value = "F"
         self.assertEqual(
-            self.stream.getvalue(), dedent("""
-
-            Failures:
-
-            foo
-
-            Errors:
-
-            bar
-
-            baz
-
-            Finished in {:.6f} seconds.
-
-            \x1b[31m4 examples, 2 errors, 1 failure\x1b[0m
-            """.format(end - start)
-            )
+            self.colored.failure(self.test, self.exc_info),
+            self.colored.color("red", "F"),
         )
+
+    def test_it_colors_errors_red(self):
+        self.formatter.error.return_value = "E"
+        self.assertEqual(
+            self.colored.error(self.test, self.exc_info),
+            self.colored.color("red", "E"),
+        )
+
+    def test_it_colors_result_green_when_successful(self):
+        self.result.wasSuccessful.return_value = True
+        self.formatter.result.return_value = "results"
+        self.assertEqual(
+            self.colored.result(self.result),
+            self.colored.color("green", "results"),
+        )
+
+    def test_it_colors_result_red_when_unsuccessful(self):
+        self.result.wasSuccessful.return_value = False
+        self.formatter.result.return_value = "results"
+        self.assertEqual(
+            self.colored.result(self.result),
+            self.colored.color("red", "results"),
+        )
+
+
+class TestFormatter(TestCase, PatchMixin):
+    def setUp(self):
+        self.elapsed = 1.23456789
+        self.result = mock.Mock()
+        self.test = mock.Mock()
+        self.exc_info = fake_exc_info()
+
+        self.stream = StringIO()
+        self.formatter = result.Formatter(self.stream)
+
+    def test_it_writes_to_stderr_by_default(self):
+        self.assertEqual(result.Formatter().stream, sys.stderr)
+
+    def test_show_writes_and_flushes(self):
+        self.stream.flush = mock.Mock()
+        self.formatter.show("hello\n")
+        self.assertEqual(self.stream.getvalue(), "hello\n")
+        self.assertTrue(self.stream.flush.called)
+
+    def test_result(self):
+        self.result.testsRun = 20
+        self.result.errors = range(8)
+        self.result.failures = range(2)
+
+        self.assertEqual(
+            self.formatter.result(self.result),
+            "\n20 examples, 8 errors, 2 failures\n",
+        )
+
+    def test_timing(self):
+        self.assertEqual(
+            self.formatter.timing(self.elapsed),
+            "\n\nFinished in {} seconds.\n".format(self.elapsed),
+        )
+
+    def test_error(self):
+        self.assertEqual(self.formatter.error(self.test, self.exc_info), "E")
+
+    def test_failure(self):
+        self.assertEqual(self.formatter.failure(self.test, self.exc_info), "F")
+
+    def test_success(self):
+        self.assertEqual(self.formatter.success(self.test), ".")

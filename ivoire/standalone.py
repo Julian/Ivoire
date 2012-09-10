@@ -4,7 +4,7 @@ import collections
 import contextlib
 import sys
 
-from ivoire.result import IvoireResult
+from ivoire.result import ExampleResult, Formatter
 
 
 class _ShouldStop(Exception):
@@ -42,14 +42,12 @@ class ExampleGroup(object):
 
     """
 
-    DefaultResult = IvoireResult
-
     def __init__(self, describes, failfast=False, Example=Example):
         self.Example = Example
         self.describes = describes
         self.examples = []
 
-        self.result = self.DefaultResult()
+        self.result = ExampleResult(Formatter())
         self.result.failfast = failfast
 
     def __enter__(self):
