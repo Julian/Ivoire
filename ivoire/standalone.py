@@ -70,13 +70,13 @@ class ExampleGroup(object):
         )
 
     @contextlib.contextmanager
-    def __call__(self, description):
+    def __call__(self, name):
         """
         Construct and return a new ``Example``.
 
         """
 
-        example = self.Example(description)
+        example = self.Example(name)
         self.add_example(example)
         self.result.startTest(example)
         try:

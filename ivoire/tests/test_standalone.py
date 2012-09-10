@@ -122,7 +122,7 @@ class TestExample(TestCase, PatchMixin):
         self.name = "does a thing"
         self.example = Example(self.name)
 
-    def test_it_knows_its_name(self):
+    def test_str(self):
         self.assertEqual(str(self.example), self.name)
 
     def test_repr(self):
