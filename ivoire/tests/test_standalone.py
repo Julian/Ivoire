@@ -2,29 +2,30 @@ from __future__ import unicode_literals
 from functools import wraps
 from unittest import TestCase
 
+import ivoire
 from ivoire.standalone import Example, ExampleGroup, describe
 from ivoire.tests.util import PatchMixin, mock
 
 
-class TestDescribe(TestCase):
+class TestDescribe(TestCase, PatchMixin):
     def test_describe(self):
         self.assertEqual(describe, ExampleGroup)
 
     def test_it_can_have_Example_specified(self):
+        self.patchObject(ivoire, "current_result")
         OtherExample = mock.Mock()
+
         it = ExampleGroup(describe, Example=OtherExample)
         self.assertEqual(it.Example, OtherExample)
-
-    def test_it_respects_fail_fast(self):
-        it = ExampleGroup(describe, failfast=True)
-        self.assertTrue(it.result.failfast)
 
 
 class TestDescribeTests(TestCase, PatchMixin):
     def setUp(self):
+        self.result = self.patchObject(
+            ivoire, "current_result", shouldStop=False
+        )
         self.describes = ExampleGroup
         self.it = ExampleGroup(self.describes)
-        self.result = self.patchObject(self.it, "result", shouldStop=False)
 
     def test_repr(self):
         self.assertEqual(
@@ -34,6 +35,11 @@ class TestDescribeTests(TestCase, PatchMixin):
 
     def test_it_sets_the_described_object(self):
         self.assertEqual(self.it.describes, self.describes)
+
+    def test_it_raises_an_error_if_the_result_is_not_set(self):
+        self.patchObject(ivoire, "current_result", None)
+        with self.assertRaises(ValueError):
+            ExampleGroup(self.describes)
 
     def test_it_starts_and_stops_a_test_run(self):
         with self.it:

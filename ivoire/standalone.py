@@ -4,6 +4,7 @@ import collections
 import contextlib
 import sys
 
+import ivoire
 from ivoire.result import ExampleResult, Formatter
 
 
@@ -42,13 +43,17 @@ class ExampleGroup(object):
 
     """
 
-    def __init__(self, describes, failfast=False, Example=Example):
+    def __init__(self, describes, Example=Example):
         self.Example = Example
         self.describes = describes
         self.examples = []
 
-        self.result = ExampleResult(Formatter())
-        self.result.failfast = failfast
+        result = self.result = ivoire.current_result
+        if result is None:
+            raise ValueError(
+                "ivoire.current_result must be set to a TestResult before "
+                "execution starts!"
+            )
 
     def __enter__(self):
         self.result.startTestRun()
