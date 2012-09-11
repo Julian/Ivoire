@@ -59,12 +59,16 @@ def run(config):
 
     """
 
+    ivoire.current_result.startTestRun()
+
     for spec in config.FilePathsOrFQNs:
         if os.path.sep in spec:
             name = os.path.basename(os.path.splitext(spec)[0])
             imp.load_source(name, spec)
         else:
             __import__(spec)
+
+    ivoire.current_result.stopTestRun()
 
 
 def main(arguments=None):

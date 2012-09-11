@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
-from functools import wraps
 from unittest import TestCase
+import sys
 
 import ivoire
 from ivoire.standalone import Example, ExampleGroup, describe
@@ -36,16 +36,6 @@ class TestDescribeTests(TestCase, PatchMixin):
     def test_it_sets_the_described_object(self):
         self.assertEqual(self.it.describes, self.describes)
 
-    def test_it_raises_an_error_if_the_result_is_not_set(self):
-        self.patchObject(ivoire, "current_result", None)
-        with self.assertRaises(ValueError):
-            ExampleGroup(self.describes)
-
-    def test_it_starts_and_stops_a_test_run(self):
-        with self.it:
-            self.result.startTestRun.assert_called_once_with()
-        self.result.stopTestRun.assert_called_once_with()
-
     def test_it_adds_an_example(self):
         with self.it as it:
             with it("does a thing") as test:
@@ -80,30 +70,41 @@ class TestDescribeTests(TestCase, PatchMixin):
 
     def test_it_can_fail(self):
         with self.it as it:
-            exc = self.patch("ivoire.standalone.sys.exc_info").return_value
-
             with it("does a thing") as test:
-                test.fail()
+                try:
+                    test.fail()
+                except Exception:
+                    exc_info = sys.exc_info()
+                    raise
 
         self.result.assert_has_calls([
                 mock.call.startTest(test),
-                mock.call.addFailure(test, exc),
+                mock.call.addFailure(test, exc_info),
                 mock.call.stopTest(test),
         ])
 
     def test_it_can_error(self):
         with self.it as it:
-            exc = self.patch("ivoire.standalone.sys.exc_info").return_value
-
             with it("does a thing") as test:
-                raise IndexError()
+                try:
+                    raise IndexError
+                except IndexError:
+                    exc_info = sys.exc_info()
+                    raise
 
         self.result.assert_has_calls([
                 mock.call.startTest(test),
-                mock.call.addError(test, exc),
+                mock.call.addError(test, exc_info),
                 mock.call.stopTest(test),
         ])
 
+
+    from unittest import skipIf
+    import platform
+    @skipIf(
+        "PyPy" == platform.python_implementation(),
+        "https://bugs.pypy.org/issue1260",
+    )
     def test_it_does_not_swallow_KeyboardInterrupts(self):
         with self.assertRaises(KeyboardInterrupt):
             with self.it as it:
@@ -125,6 +126,9 @@ class TestDescribeTests(TestCase, PatchMixin):
 
 class TestExample(TestCase, PatchMixin):
     def setUp(self):
+        self.result = self.patchObject(
+            ivoire, "current_result", shouldStop=False
+        )
         self.name = "does a thing"
         self.group = mock.Mock()
         self.example = Example(self.name, self.group)
@@ -137,6 +141,11 @@ class TestExample(TestCase, PatchMixin):
             repr(self.example),
             "<{0.__class__.__name__}: {0}>".format(self.example)
         )
+
+    def test_it_raises_an_error_if_the_result_is_not_set(self):
+        self.patchObject(ivoire, "current_result", None)
+        with self.assertRaises(ValueError):
+            Example(self.name, self.group)
 
     def test_it_knows_its_group(self):
         self.assertEqual(self.example.group, self.group)

@@ -58,14 +58,22 @@ class TestMain(TestCase, PatchMixin):
 
 
 class TestRun(TestCase, PatchMixin):
+    def setUp(self):
+        self.imp = self.patchObject(run, "imp")
+        self.importfn = self.patchObject(run, "__import__", create=True)
+        self.result = self.patchObject(ivoire, "current_result")
+
+    def test_it_starts_and_stops_a_test_run(self):
+        run.run(mock.Mock(FilePathsOrFQNs=[]))
+        self.result.startTestRun.assert_called_once_with()
+        self.result.stopTestRun.assert_called_once_with()
+
     def test_parses_and_loads_specs(self):
-        imp = self.patchObject(run, "imp")
-        importfn = self.patchObject(run, "__import__", create=True)
         cfg = mock.Mock(FilePathsOrFQNs=["foo.bar", "foo/bar/baz.py", "foo"])
 
         run.run(cfg)
 
         self.assertEqual(
-            importfn.mock_calls, [mock.call("foo.bar"), mock.call("foo")],
+            self.importfn.mock_calls, [mock.call("foo.bar"), mock.call("foo")],
         )
-        imp.load_source.assert_called_once_with("baz", "foo/bar/baz.py")
+        self.imp.load_source.assert_called_once_with("baz", "foo/bar/baz.py")
