@@ -4,6 +4,7 @@ from unittest import TestCase
 import sys
 
 from ivoire import result
+from ivoire.util import indent
 from ivoire.tests.util import PatchMixin, mock
 
 
@@ -164,9 +165,10 @@ class TestColored(TestCase, PatchMixin):
         example.__str__.return_value = "Example"
         traceback = "The\nTraceback\n"
 
+        name = self.colored.color("blue", str(example))
         self.assertEqual(
             self.colored.traceback(example, traceback),
-            self.colored.color("blue", str(example)) + "\n" + traceback,
+            indent(name + "\n" + traceback, 4 * " "),
         )
 
 

@@ -3,6 +3,8 @@ from unittest import TestResult
 import sys
 import time
 
+from ivoire.util import indent
+
 
 class ExampleResult(TestResult):
     """
@@ -128,7 +130,8 @@ class Colored(FormatterMixin):
         return self.color("green", self._formatter.success(example))
 
     def traceback(self, example, traceback):
-        return "\n".join([self.color("blue", str(example)), traceback])
+        colored = "\n".join([self.color("blue", str(example)), traceback])
+        return indent(colored, 4 * " ")
 
     def result_summary(self, result):
         output = self._formatter.result_summary(result)
