@@ -12,8 +12,8 @@ class _ShouldStop(Exception):
     pass
 
 
-# TestCase requires the name of an existing method on itself on creation,
-# because of the way it's default implementation of .run() works. So shut up.
+# TestCase requires the name of an existing method on creation in 2.X because 
+# of the way the default implementation of .run() works. So make it shut up.
 _MAKE_UNITTEST_SHUT_UP = "__init__"
 
 
