@@ -34,8 +34,13 @@ class ExampleResult(TestResult):
     def stopTestRun(self):
         super(ExampleResult, self).stopTestRun()
         self.elapsed = time.time() - self._start
-        stats = self.formatter.statistics(elapsed=self.elapsed, result=self)
-        self.formatter.show(stats)
+
+        self.formatter.finished()
+        self.formatter.show(self.formatter.errors(self.errors))
+        self.formatter.show(self.formatter.failures(self.failures))
+        self.formatter.show(
+            self.formatter.statistics(elapsed=self.elapsed, result=self)
+        )
 
 
 class FormatterMixin(object):
@@ -44,6 +49,14 @@ class FormatterMixin(object):
 
     """
 
+    def finished(self):
+        """
+        The run has finished.
+
+        """
+
+        self.show("\n\n")
+
     def statistics(self, elapsed, result):
         """
         Return output for the combined time and result summary statistics.
@@ -51,6 +64,20 @@ class FormatterMixin(object):
         """
 
         return "\n".join((self.timing(elapsed), self.result_summary(result)))
+
+    def errors(self, errors):
+        if not errors:
+            return ""
+
+        tracebacks = (self.traceback(error, tb) for error, tb in errors)
+        return "\n".join(["Errors:\n", "\n".join(tracebacks), ""])
+
+    def failures(self, failures):
+        if not failures:
+            return ""
+
+        tracebacks = (self.traceback(fail, tb) for fail, tb in failures)
+        return "\n".join(["Failures:\n", "\n".join(tracebacks), ""])
 
 
 class Colored(FormatterMixin):
@@ -101,6 +128,9 @@ class Colored(FormatterMixin):
     def success(self, test):
         return self.color("green", self._formatter.success(test))
 
+    def traceback(self, test, traceback):
+        return "\n".join([self.color("blue", str(test)) ,traceback])
+
     def result_summary(self, result):
         output = self._formatter.result_summary(result)
 
@@ -138,7 +168,7 @@ class Formatter(FormatterMixin):
 
         """
 
-        return "\n\nFinished in {:.6f} seconds.\n".format(elapsed)
+        return "Finished in {:.6f} seconds.\n".format(elapsed)
 
     def error(self, test, exc_info):
         """
@@ -163,3 +193,11 @@ class Formatter(FormatterMixin):
         """
 
         return "."
+
+    def traceback(self, test, traceback):
+        """
+        Format an example and its traceback.
+
+        """
+
+        return "\n".join((str(test), traceback))

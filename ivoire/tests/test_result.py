@@ -51,16 +51,21 @@ class TestExampleResult(TestCase, PatchMixin):
         )
         self.assertShown(self.formatter.failure.return_value)
 
-    def test_show_statistics(self):
+    def test_shows_statistics_and_non_successes(self):
         self.result.startTestRun()
         self.result.stopTestRun()
 
-        self.formatter.statistics.assert_called_once_with(
-            elapsed=self.result.elapsed, result=self.result,
-        )
-        self.formatter.show.assert_called_once_with(
-            self.formatter.statistics.return_value
-        )
+        elapsed = self.result.elapsed
+
+        self.formatter.assert_has_calls([
+            mock.call.finished(),
+            mock.call.errors(self.result.errors),
+            mock.call.show(self.formatter.errors.return_value),
+            mock.call.failures(self.result.failures),
+            mock.call.show(self.formatter.failures.return_value),
+            mock.call.statistics(elapsed=elapsed, result=self.result),
+            mock.call.show(self.formatter.statistics.return_value),
+        ])
 
 
 class TestFormatterMixin(TestCase, PatchMixin):
@@ -69,6 +74,29 @@ class TestFormatterMixin(TestCase, PatchMixin):
 
     def setUp(self):
         self.formatter = self.Formatter()
+
+    def test_finished(self):
+        self.formatter.show = mock.Mock()
+        self.formatter.finished()
+        self.formatter.show.assert_called_once_with("\n\n")
+
+    def test_errors(self):
+        self.formatter.traceback.side_effect = ["a\nb\n", "c\nd\n"]
+        errors = [(mock.Mock(), mock.Mock()), (mock.Mock(), mock.Mock())]
+        self.assertEqual(
+            self.formatter.errors(errors), "Errors:\n\na\nb\n\nc\nd\n\n"
+        )
+
+    def test_failures(self):
+        self.formatter.traceback.side_effect = ["a\nb\n", "c\nd\n"]
+        failures = [(mock.Mock(), mock.Mock()), (mock.Mock(), mock.Mock())]
+        self.assertEqual(
+            self.formatter.failures(failures), "Failures:\n\na\nb\n\nc\nd\n\n"
+        )
+
+    def test_return_nothing_if_no_errors(self):
+        self.assertEqual("", self.formatter.errors([]))
+        self.assertFalse("", self.formatter.failures([]))
 
     def test_statistics(self):
         elapsed, result = mock.Mock(), mock.Mock()
@@ -132,6 +160,16 @@ class TestColored(TestCase, PatchMixin):
             self.colored.color("red", "results"),
         )
 
+    def test_it_colors_example_names_blue_in_tracebacks(self):
+        example = mock.MagicMock()
+        example.__str__.return_value = "Example"
+        traceback = "The\nTraceback\n"
+
+        self.assertEqual(
+            self.colored.traceback(example, traceback),
+            self.colored.color("blue", str(example)) + "\n" + traceback,
+        )
+
 
 class TestFormatter(TestCase, PatchMixin):
     def setUp(self):
@@ -165,7 +203,7 @@ class TestFormatter(TestCase, PatchMixin):
     def test_timing(self):
         self.assertEqual(
             self.formatter.timing(self.elapsed),
-            "\n\nFinished in {:.6f} seconds.\n".format(self.elapsed),
+            "Finished in {:.6f} seconds.\n".format(self.elapsed),
         )
 
     def test_error(self):
@@ -176,3 +214,13 @@ class TestFormatter(TestCase, PatchMixin):
 
     def test_success(self):
         self.assertEqual(self.formatter.success(self.test), ".")
+
+    def test_traceback(self):
+        example = mock.MagicMock()
+        example.__str__.return_value = "Example"
+        traceback = "The\nTraceback\n"
+
+        self.assertEqual(
+            self.formatter.traceback(example, traceback),
+            "\n".join([str(example), traceback])
+        )
