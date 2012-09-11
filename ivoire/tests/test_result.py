@@ -55,14 +55,28 @@ class TestExampleResult(TestCase, PatchMixin):
         self.result.startTestRun()
         self.result.stopTestRun()
 
-        self.assertEqual(
-            self.formatter.mock_calls, [
-                mock.call.timing(self.result.elapsed),
-                mock.call.show(self.formatter.timing.return_value),
-                mock.call.result(self.result),
-                mock.call.show(self.formatter.result.return_value),
-            ],
+        self.formatter.statistics.assert_called_once_with(
+            elapsed=self.result.elapsed, result=self.result,
         )
+        self.formatter.show.assert_called_once_with(
+            self.formatter.statistics.return_value
+        )
+
+
+class TestFormatterMixin(TestCase, PatchMixin):
+    class Formatter(mock.Mock, result.FormatterMixin):
+        pass
+
+    def setUp(self):
+        self.formatter = self.Formatter()
+
+    def test_statistics(self):
+        elapsed, result = mock.Mock(), mock.Mock()
+        timing_output = self.formatter.timing.return_value = "timing\n"
+        result_output = self.formatter.result.return_value = "result\n"
+
+        stats = self.formatter.statistics(elapsed=elapsed, result=result)
+        self.assertEqual(stats, "\n".join([timing_output, result_output]))
 
 
 class TestColored(TestCase, PatchMixin):
@@ -145,7 +159,7 @@ class TestFormatter(TestCase, PatchMixin):
 
         self.assertEqual(
             self.formatter.result(self.result),
-            "\n20 examples, 8 errors, 2 failures\n",
+            "20 examples, 8 errors, 2 failures\n",
         )
 
     def test_timing(self):

@@ -21,27 +21,34 @@ class ExampleResult(TestResult):
 
     def addError(self, test, exc_info):
         super(ExampleResult, self).addError(test, exc_info)
-        output = self.formatter.error(test, exc_info)
-        self.formatter.show(output)
+        self.formatter.show(self.formatter.error(test, exc_info))
 
     def addFailure(self, test, exc_info):
         super(ExampleResult, self).addFailure(test, exc_info)
-        output = self.formatter.failure(test, exc_info)
-        self.formatter.show(output)
+        self.formatter.show(self.formatter.failure(test, exc_info))
 
     def addSuccess(self, test):
         super(ExampleResult, self).addSuccess(test)
-        output = self.formatter.success(test)
-        self.formatter.show(output)
+        self.formatter.show(self.formatter.success(test))
 
     def stopTestRun(self):
         super(ExampleResult, self).stopTestRun()
         self.elapsed = time.time() - self._start
-        self.formatter.show(self.formatter.timing(self.elapsed))
-        self.formatter.show(self.formatter.result(self))
+        stats = self.formatter.statistics(elapsed=self.elapsed, result=self)
+        self.formatter.show(stats)
 
 
-class Colored(object):
+class FormatterMixin(object):
+    """
+    Provide some higher-level formatting using the child's building blocks.
+
+    """
+
+    def statistics(self, elapsed, result):
+        return "\n".join((self.timing(elapsed), self.result(result)))
+
+
+class Colored(FormatterMixin):
     """
     Wrap a formatter to show colored output.
 
@@ -92,7 +99,7 @@ class Colored(object):
         return self.color("red", output)
 
 
-class Formatter(object):
+class Formatter(FormatterMixin):
     def __init__(self, stream=sys.stderr):
         self.stream = stream
 
@@ -106,7 +113,7 @@ class Formatter(object):
         self.stream.flush()
 
     def result(self, result):
-        return "\n{} examples, {} errors, {} failures\n".format(
+        return "{} examples, {} errors, {} failures\n".format(
             result.testsRun, len(result.errors), len(result.failures),
         )
 
