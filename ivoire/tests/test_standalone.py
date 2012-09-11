@@ -126,7 +126,8 @@ class TestDescribeTests(TestCase, PatchMixin):
 class TestExample(TestCase, PatchMixin):
     def setUp(self):
         self.name = "does a thing"
-        self.example = Example(self.name)
+        self.group = mock.Mock()
+        self.example = Example(self.name, self.group)
 
     def test_str(self):
         self.assertEqual(str(self.example), self.name)
@@ -137,10 +138,20 @@ class TestExample(TestCase, PatchMixin):
             "<{0.__class__.__name__}: {0}>".format(self.example)
         )
 
-    def test_same_name_has_the_same_hash(self):
-        same = Example(self.name)
+    def test_it_knows_its_group(self):
+        self.assertEqual(self.example.group, self.group)
+
+    def test_group_is_prevented_from_accidental_setting(self):
+        with self.assertRaises(AttributeError):
+            self.example.group = 12
+
+    def test_same_name_and_group_has_the_same_hash(self):
+        same = Example(self.name, self.group)
         self.assertEqual(hash(self.example), hash(same))
 
-    def test_different_name_has_a_different_hash(self):
-        other = Example("does a different thing")
+    def test_different_name_or_group_has_a_different_hash(self):
+        other = Example("does a different thing", self.group)
+        another = Example(str(self.example), mock.Mock())
+
         self.assertNotEqual(hash(self.example), hash(other))
+        self.assertNotEqual(hash(self.example), hash(another))

@@ -23,18 +23,23 @@ class Example(TestCase):
 
     """
 
-    def __init__(self, name):
+    def __init__(self, name, group):
         super(Example, self).__init__(_MAKE_UNITTEST_SHUT_UP)
+        self.__group = group
         self.__name = name
 
     def __hash__(self):
-        return hash((self.__class__, self.__name))
+        return hash((self.__class__, self.group, self.__name))
 
     def __repr__(self):
         return "<{self.__class__.__name__}: {self}>".format(self=self)
 
     def __str__(self):
         return self.__name
+
+    @property
+    def group(self):
+        return self.__group
 
 
 class ExampleGroup(object):
@@ -44,25 +49,26 @@ class ExampleGroup(object):
     """
 
     def __init__(self, describes, Example=Example):
-        self.Example = Example
-        self.describes = describes
-        self.examples = []
+        result = self._result = ivoire.current_result
 
-        result = self.result = ivoire.current_result
         if result is None:
             raise ValueError(
                 "ivoire.current_result must be set to a TestResult before "
                 "execution starts!"
             )
 
+        self.Example = Example
+        self.describes = describes
+        self.examples = []
+
     def __enter__(self):
-        self.result.startTestRun()
+        self._result.startTestRun()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type == _ShouldStop:
             return True
-        self.result.stopTestRun()
+        self._result.stopTestRun()
 
     def __iter__(self):
         return iter(self.examples)
@@ -79,24 +85,24 @@ class ExampleGroup(object):
 
         """
 
-        example = self.Example(name)
+        example = self.Example(name, self)
         self.add_example(example)
-        self.result.startTest(example)
+        self._result.startTest(example)
         try:
             yield example
         except KeyboardInterrupt:
             raise
         except example.failureException:
-            self.result.addFailure(example, sys.exc_info())
+            self._result.addFailure(example, sys.exc_info())
         except:
-            self.result.addError(example, sys.exc_info())
+            self._result.addError(example, sys.exc_info())
         else:
-            self.result.addSuccess(example)
+            self._result.addSuccess(example)
         finally:
             example.doCleanups()
-            self.result.stopTest(example)
+            self._result.stopTest(example)
 
-            if self.result.shouldStop:
+            if self._result.shouldStop:
                 raise _ShouldStop
 
     def add_example(self, example):
