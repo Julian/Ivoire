@@ -45,7 +45,7 @@ class FormatterMixin(object):
     """
 
     def statistics(self, elapsed, result):
-        return "\n".join((self.timing(elapsed), self.result(result)))
+        return "\n".join((self.timing(elapsed), self.result_summary(result)))
 
 
 class Colored(FormatterMixin):
@@ -91,8 +91,8 @@ class Colored(FormatterMixin):
     def success(self, test):
         return self.color("green", self._formatter.success(test))
 
-    def result(self, result):
-        output = self._formatter.result(result)
+    def result_summary(self, result):
+        output = self._formatter.result_summary(result)
 
         if result.wasSuccessful():
             return self.color("green", output)
@@ -112,7 +112,7 @@ class Formatter(FormatterMixin):
         self.stream.write(text)
         self.stream.flush()
 
-    def result(self, result):
+    def result_summary(self, result):
         return "{} examples, {} errors, {} failures\n".format(
             result.testsRun, len(result.errors), len(result.failures),
         )

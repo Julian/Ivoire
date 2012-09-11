@@ -73,7 +73,7 @@ class TestFormatterMixin(TestCase, PatchMixin):
     def test_statistics(self):
         elapsed, result = mock.Mock(), mock.Mock()
         timing_output = self.formatter.timing.return_value = "timing\n"
-        result_output = self.formatter.result.return_value = "result\n"
+        result_output = self.formatter.result_summary.return_value = "result\n"
 
         stats = self.formatter.statistics(elapsed=elapsed, result=result)
         self.assertEqual(stats, "\n".join([timing_output, result_output]))
@@ -118,17 +118,17 @@ class TestColored(TestCase, PatchMixin):
 
     def test_it_colors_result_green_when_successful(self):
         self.result.wasSuccessful.return_value = True
-        self.formatter.result.return_value = "results"
+        self.formatter.result_summary.return_value = "results"
         self.assertEqual(
-            self.colored.result(self.result),
+            self.colored.result_summary(self.result),
             self.colored.color("green", "results"),
         )
 
     def test_it_colors_result_red_when_unsuccessful(self):
         self.result.wasSuccessful.return_value = False
-        self.formatter.result.return_value = "results"
+        self.formatter.result_summary.return_value = "results"
         self.assertEqual(
-            self.colored.result(self.result),
+            self.colored.result_summary(self.result),
             self.colored.color("red", "results"),
         )
 
@@ -152,13 +152,13 @@ class TestFormatter(TestCase, PatchMixin):
         self.assertEqual(self.stream.getvalue(), "hello\n")
         self.assertTrue(self.stream.flush.called)
 
-    def test_result(self):
+    def test_result_summary(self):
         self.result.testsRun = 20
         self.result.errors = range(8)
         self.result.failures = range(2)
 
         self.assertEqual(
-            self.formatter.result(self.result),
+            self.formatter.result_summary(self.result),
             "20 examples, 8 errors, 2 failures\n",
         )
 
