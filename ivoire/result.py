@@ -111,7 +111,7 @@ class Formatter(object):
         )
 
     def timing(self, elapsed):
-        return "\n\nFinished in {} seconds.\n".format(elapsed)
+        return "\n\nFinished in {:.6f} seconds.\n".format(elapsed)
 
     def error(self, test, exc_info):
         return "E"

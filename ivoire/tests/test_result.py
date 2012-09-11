@@ -148,7 +148,7 @@ class TestFormatter(TestCase, PatchMixin):
     def test_timing(self):
         self.assertEqual(
             self.formatter.timing(self.elapsed),
-            "\n\nFinished in {} seconds.\n".format(self.elapsed),
+            "\n\nFinished in {:.6f} seconds.\n".format(self.elapsed),
         )
 
     def test_error(self):
