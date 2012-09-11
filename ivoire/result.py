@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-from textwrap import dedent
 from unittest import TestResult
 import sys
 import time
