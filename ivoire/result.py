@@ -129,7 +129,7 @@ class Colored(FormatterMixin):
         return self.color("green", self._formatter.success(test))
 
     def traceback(self, test, traceback):
-        return "\n".join([self.color("blue", str(test)) ,traceback])
+        return "\n".join([self.color("blue", str(test)), traceback])
 
     def result_summary(self, result):
         output = self._formatter.result_summary(result)
