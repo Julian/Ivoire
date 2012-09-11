@@ -19,17 +19,17 @@ class ExampleResult(TestResult):
         super(ExampleResult, self).startTestRun()
         self._start = time.time()
 
-    def addError(self, test, exc_info):
-        super(ExampleResult, self).addError(test, exc_info)
-        self.formatter.show(self.formatter.error(test, exc_info))
+    def addError(self, example, exc_info):
+        super(ExampleResult, self).addError(example, exc_info)
+        self.formatter.show(self.formatter.error(example, exc_info))
 
-    def addFailure(self, test, exc_info):
-        super(ExampleResult, self).addFailure(test, exc_info)
-        self.formatter.show(self.formatter.failure(test, exc_info))
+    def addFailure(self, example, exc_info):
+        super(ExampleResult, self).addFailure(example, exc_info)
+        self.formatter.show(self.formatter.failure(example, exc_info))
 
-    def addSuccess(self, test):
-        super(ExampleResult, self).addSuccess(test)
-        self.formatter.show(self.formatter.success(test))
+    def addSuccess(self, example):
+        super(ExampleResult, self).addSuccess(example)
+        self.formatter.show(self.formatter.success(example))
 
     def stopTestRun(self):
         super(ExampleResult, self).stopTestRun()
@@ -119,17 +119,17 @@ class Colored(FormatterMixin):
             escape=self.ANSI[color], text=text, reset=self.ANSI["reset"],
         )
 
-    def error(self, test, exc_info):
-        return self.color("red", self._formatter.error(test, exc_info))
+    def error(self, example, exc_info):
+        return self.color("red", self._formatter.error(example, exc_info))
 
-    def failure(self, test, exc_info):
-        return self.color("red", self._formatter.failure(test, exc_info))
+    def failure(self, example, exc_info):
+        return self.color("red", self._formatter.failure(example, exc_info))
 
-    def success(self, test):
-        return self.color("green", self._formatter.success(test))
+    def success(self, example):
+        return self.color("green", self._formatter.success(example))
 
-    def traceback(self, test, traceback):
-        return "\n".join([self.color("blue", str(test)), traceback])
+    def traceback(self, example, traceback):
+        return "\n".join([self.color("blue", str(example)), traceback])
 
     def result_summary(self, result):
         output = self._formatter.result_summary(result)
@@ -170,7 +170,7 @@ class Formatter(FormatterMixin):
 
         return "Finished in {:.6f} seconds.\n".format(elapsed)
 
-    def error(self, test, exc_info):
+    def error(self, example, exc_info):
         """
         An error was encountered.
 
@@ -178,7 +178,7 @@ class Formatter(FormatterMixin):
 
         return "E"
 
-    def failure(self, test, exc_info):
+    def failure(self, example, exc_info):
         """
         A failure was encountered.
 
@@ -186,7 +186,7 @@ class Formatter(FormatterMixin):
 
         return "F"
 
-    def success(self, test):
+    def success(self, example):
         """
         A success was encountered.
 
@@ -194,10 +194,10 @@ class Formatter(FormatterMixin):
 
         return "."
 
-    def traceback(self, test, traceback):
+    def traceback(self, example, traceback):
         """
         Format an example and its traceback.
 
         """
 
-        return "\n".join((str(test), traceback))
+        return "\n".join((str(example), traceback))
