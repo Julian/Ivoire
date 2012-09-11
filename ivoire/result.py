@@ -45,6 +45,11 @@ class FormatterMixin(object):
     """
 
     def statistics(self, elapsed, result):
+        """
+        Return output for the combined time and result summary statistics.
+
+        """
+
         return "\n".join((self.timing(elapsed), self.result_summary(result)))
 
 
@@ -70,6 +75,11 @@ class Colored(FormatterMixin):
         self._formatter = formatter
 
     def __getattr__(self, attr):
+        """
+        Delegate to the wrapped formatter.
+
+        """
+
         return getattr(self._formatter, attr)
 
     def color(self, color, text):
@@ -113,18 +123,43 @@ class Formatter(FormatterMixin):
         self.stream.flush()
 
     def result_summary(self, result):
+        """
+        Return a summary of the results.
+
+        """
+
         return "{} examples, {} errors, {} failures\n".format(
             result.testsRun, len(result.errors), len(result.failures),
         )
 
     def timing(self, elapsed):
+        """
+        Return output on the time taken on the examples run.
+
+        """
+
         return "\n\nFinished in {:.6f} seconds.\n".format(elapsed)
 
     def error(self, test, exc_info):
+        """
+        An error was encountered.
+
+        """
+
         return "E"
 
     def failure(self, test, exc_info):
+        """
+        A failure was encountered.
+
+        """
+
         return "F"
 
     def success(self, test):
+        """
+        A success was encountered.
+
+        """
+
         return "."
