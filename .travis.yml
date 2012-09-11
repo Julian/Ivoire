@@ -1,0 +1,6 @@
+language: python
+python:
+  - "pypy"
+  - "2.7"
+  - "3.2"
+script: nosetests -s --ignore-files 'transform.py' ivoire
