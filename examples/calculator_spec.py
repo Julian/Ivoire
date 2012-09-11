@@ -1,3 +1,8 @@
+"""
+A simple calculator specification.
+
+"""
+
 from ivoire import describe
 
 
