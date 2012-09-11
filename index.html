@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Ivoire by Julian</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Ivoire</h1>
+        <p>A simple RSpec-like wrapper and translator for writing tests in Python</p>
+        <p class="view"><a href="https://github.com/Julian/Ivoire">View the Project on GitHub <small>Julian/Ivoire</small></a></p>
+        <ul>
+          <li><a href="https://github.com/Julian/Ivoire/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/Julian/Ivoire/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/Julian/Ivoire">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1></h1>
+
+<h1>Ivoire</h1>
+
+<p><code>ivoire</code> is an <code>RSpec &lt;http://rspec.info/&gt;</code>_-like library for Python. If
+you've never heard of RSpec, it's a Ruby library that is widely used, and has a
+slightly different twist on how tests should look.</p>
+
+<h2>A Small Example</h2>
+
+<p><code>ivoire</code> has two modes of operation: standalone mode and transform mode. In
+standalone mode, you simply write some tests using <code>ivoire.describe</code> and then
+execute them with the included <code>ivoire</code> test runner.</p>
+
+<p>For instance, if you run the following spec, the test output will appear on
+standard error.</p>
+
+<p>::</p>
+
+<pre><code>from ivoire import describe
+
+
+class Calculator(object):
+    def add(self, x, y):
+        return x + y
+
+    def divide(self, x, y):
+        return x / y
+
+
+with describe(Calculator) as it:
+    with it("adds two numbers") as test:
+        calculator = Calculator()
+        test.assertEqual(calculator.add(2, 4), 6)
+
+    with it("divides two numbers") as test:
+        calculator = Calculator()
+        test.assertEqual(calculator.divide(8, 4), 2)
+
+    with it("doesn't divide by zero") as test:
+        calculator = Calculator()
+        with test.assertRaises(ZeroDivisionError):
+            calculator.divide(8, 0)
+
+    with it("multiplies two numbers") as test:
+        calculator = Calculator()
+        test.assertEqual(calculator.multiply(2, 3), 6)
+</code></pre>
+
+<p>You can find this and other examples in the <code>examples</code> directory of the
+source checkout, and run them with <code>ivoire examples/calculator_spec.py</code> after
+you've installed <code>ivoire</code>.</p>
+
+<h2>Running the Test Suite</h2>
+
+<p>You can run <code>Ivoire</code>'s test suite by running <code>tox</code> in the root of the
+repository checkout, or by running <code>YourFavoriteTestRunner ivoire</code>.</p>
+
+<p>You need to have <code>tox</code> installed via your package manager or with
+<code>pip install tox</code> for the former.</p>
+
+<h2>Contributing</h2>
+
+<p><code>Ivoire</code> is developed on <code>GitHub &lt;http://github.com/Julian/Ivoire&gt;</code>_.</p>
+
+<p>Feel free to fork and submit patches or feature requests, your contributions
+are most welcome!</p>
+
+<p>If you'd like the best chance for them to be merged quickly try to include
+tests with your pull request, and adhere to general Python coding standards and
+your own common sense :).</p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/Julian">Julian</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-34724411-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
