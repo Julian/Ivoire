@@ -55,11 +55,14 @@ class TestExampleResult(TestCase, PatchMixin):
         self.result.startTestRun()
         self.result.stopTestRun()
 
-        self.formatter.timing.assert_called_once_with(self.result.elapsed)
-        self.assertShown(self.formatter.timing.return_value)
-
-        self.formatter.result.assert_called_once_with(self.result)
-        self.assertShown(self.formatter.result.return_value)
+        self.assertEqual(
+            self.formatter.mock_calls, [
+                mock.call.timing(self.result.elapsed),
+                mock.call.show(self.formatter.timing.return_value),
+                mock.call.result(self.result),
+                mock.call.show(self.formatter.result.return_value),
+            ],
+        )
 
 
 class TestColored(TestCase, PatchMixin):
