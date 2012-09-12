@@ -25,44 +25,21 @@ A Small Example
 standalone mode, you simply write some tests using ``ivoire.describe`` and then
 execute them with the included ``ivoire`` test runner.
 
-For instance, if you run the following spec, the test output will appear on
-standard error.
+Here's an example of what a specification looks like.
 
-.. code:: python
+.. include:: examples/calculator_spec.py
+    :number-lines:
+    :code: python
 
-    from ivoire import describe
+You can find this example at ``examples/calculator_spec.py``, alongside a few
+other examples.
 
+After installing Ivoire, running the example above with 
+``ivoire examples/calculator_spec.py`` should produce:
 
-    class Calculator(object):
-        def add(self, x, y):
-            return x + y
-
-        def divide(self, x, y):
-            return x / y
-
-
-    with describe(Calculator) as it:
-        with it("adds two numbers") as test:
-            calculator = Calculator()
-            test.assertEqual(calculator.add(2, 4), 6)
-
-        with it("divides two numbers") as test:
-            calculator = Calculator()
-            test.assertEqual(calculator.divide(8, 4), 2)
-
-        with it("doesn't divide by zero") as test:
-            calculator = Calculator()
-            with test.assertRaises(ZeroDivisionError):
-                calculator.divide(8, 0)
-
-        with it("multiplies two numbers") as test:
-            calculator = Calculator()
-            test.assertEqual(calculator.multiply(2, 3), 6)
-
-
-You can find this and other examples in the ``examples`` directory of the
-source checkout, and run them with ``ivoire examples/calculator_spec.py`` after
-you've installed ``ivoire``.
+.. image:: examples/calculator_spec_output.png
+    :alt: spec output
+    :align: center
 
 
 Running the Test Suite
