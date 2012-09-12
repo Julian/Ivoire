@@ -77,14 +77,6 @@ class ExampleGroup(object):
     """
 
     def __init__(self, describes, Example=Example):
-        result = self._result = ivoire.current_result
-
-        if result is None:
-            raise ValueError(
-                "ivoire.current_result must be set to a TestResult before "
-                "execution starts!"
-            )
-
         self.Example = Example
         self.describes = describes
         self.examples = []
