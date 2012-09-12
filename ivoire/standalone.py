@@ -96,6 +96,9 @@ class ExampleGroup(object):
             self=self
         )
 
+    def __str__(self):
+        return self.describes.__name__
+
     def __call__(self, name):
         """
         Construct and return a new ``Example``.

@@ -163,9 +163,10 @@ class TestColored(TestCase, PatchMixin):
     def test_it_colors_example_names_blue_in_tracebacks(self):
         example = mock.MagicMock()
         example.__str__.return_value = "Example"
+        example.group.__str__.return_value = "Thing"
         traceback = "The\nTraceback\n"
 
-        name = self.colored.color("blue", str(example))
+        name = self.colored.color("blue", "Thing: Example")
         self.assertEqual(
             self.colored.traceback(example, traceback),
             indent(name + "\n" + traceback, 4 * " "),

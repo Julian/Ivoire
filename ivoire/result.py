@@ -130,7 +130,8 @@ class Colored(FormatterMixin):
         return self.color("green", self._formatter.success(example))
 
     def traceback(self, example, traceback):
-        colored = "\n".join([self.color("blue", str(example)), traceback])
+        name = str(example.group) + ": " + str(example)
+        colored = "\n".join([self.color("blue", name), traceback])
         return indent(colored, 4 * " ")
 
     def result_summary(self, result):

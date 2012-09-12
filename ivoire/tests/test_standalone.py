@@ -27,6 +27,9 @@ class TestDescribeTests(TestCase, PatchMixin):
         self.describes = ExampleGroup
         self.it = ExampleGroup(self.describes)
 
+    def test_str(self):
+        self.assertEqual(str(self.it), self.it.describes.__name__)
+
     def test_repr(self):
         self.assertEqual(
             repr(self.it),
