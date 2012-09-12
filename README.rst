@@ -7,7 +7,7 @@ Python. It aims to bring a few minor constructs over to Python in a way that
 isn't overwhelmingly disruptive or counterculture.
 
 In case you've never heard of RSpec, it's a Ruby
-`BDD <http://en.wikipedia.org/wiki/Behavior_driven_development>_` framework
+`BDD <http://en.wikipedia.org/wiki/Behavior_driven_development>`_ framework
 that is fairly widely used, and whose tests have a style unique from xUnit's.
 
 
