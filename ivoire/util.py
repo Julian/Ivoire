@@ -19,3 +19,12 @@ except ImportError:
             for line in text.splitlines(True):
                 yield (prefix + line if predicate(line) else line)
         return ''.join(prefixed_lines())
+
+
+def is_spec(path):
+    """
+    Check if a path is a spec file or not.
+
+    """
+
+    return path.endswith("_spec.py")

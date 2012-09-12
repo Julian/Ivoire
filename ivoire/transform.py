@@ -1,18 +1,12 @@
 import importlib.machinery
 import sys
 
-
-def is_ivoire_module(path):
-    with open(path) as file:
-        return any(
-            line.startswith(("from ivoire import ", "import ivoire"))
-            for line in file
-        )
+from ivoire.util import is_spec
 
 
 class IvoireImporter(importlib.machinery.SourceFileLoader):
     def __init__(self, fullname, path, *args, **kwargs):
-        if not is_ivoire_module(path):
+        if not is_spec(path):
             raise ImportError()
         super(IvoireImporter, self).__init__(fullname, path, *args, **kwargs)
 
