@@ -1,17 +1,12 @@
-from io import FileIO, StringIO
 from textwrap import dedent
 from unittest import TestCase
+import ast
 
 from ivoire import transform
 from ivoire.tests.util import PatchMixin, mock
 
 
-FAKE_MODULE, FAKE_PATH = "a_module", "a/path"
-
-
-def importer(module=FAKE_MODULE, path=FAKE_PATH):
-    with mock.patch.object(transform, "is_spec", lambda path : True):
-        return transform.ExampleImporter(module, path)
+FAKE_PATH = "a/path"
 
 
 class TestLoad(TestCase, PatchMixin):
@@ -27,20 +22,19 @@ class TestLoad(TestCase, PatchMixin):
         )
 
 
-class TestInstall(TestCase, PatchMixin):
+class TestInstallUninstall(TestCase, PatchMixin):
+    def setUp(self):
+        self.path_hooks = self.patchObject(transform.sys, "path_hooks", [])
+
     def test_adds_loader_to_path_hooks(self):
-        hooks = self.patchObject(transform.sys, "path_hooks", [next])
+        self.path_hooks.append(next)
         transform.ExampleImporter.register()
-        self.assertEqual(hooks, [next, transform.ExampleImporter])
+        self.assertEqual(self.path_hooks, [next, transform.ExampleImporter])
 
-
-class TestUninstall(TestCase, PatchMixin):
     def test_removes_loader_from_path_hooks(self):
-        hooks = self.patchObject(
-            transform.sys, "path_hooks", [next, transform.ExampleImporter]
-        )
+        self.path_hooks.extend([next, transform.ExampleImporter])
         transform.ExampleImporter.unregister()
-        self.assertEqual(hooks, [next])
+        self.assertEqual(self.path_hooks, [next])
 
 
 class TestFindModules(TestCase, PatchMixin):
@@ -63,36 +57,62 @@ class TestFindModules(TestCase, PatchMixin):
         self.assertEqual(loader, importer)
 
 
-class TestModuleLoading(TestCase, PatchMixin):
-    def setUp(self):
-        self.importer = importer()
-        self.parse = self.patchObject(transform.ast, "parse")
-        self.source = mock.Mock()
-
-    def test_it_transforms_the_source(self):
-        Transformer = self.patchObject(transform, "ExampleTransformer")
-        visit = Transformer.return_value.visit
-
-        transformed = self.importer.transform(self.source)
-        self.assertEqual(transformed, visit.return_value)
-        self.parse.assert_called_once_with(self.source)
-
-
 class TestExampleTransformer(TestCase, PatchMixin):
     def setUp(self):
         self.transformer = transform.ExampleTransformer()
-        self.source = dedent("""
-        from ivoire import describe
 
-        with describe(next) as it:
-            with it("returns the next element") as test:
-                test.assertEqual(next(iter([1, 2, 3])), 1)
+    def assertNotTransformed(self, source):
+        node = ast.parse(dedent(source))
+        transformed = self.transformer.transform(node)
+        self.assertIs(node, transformed, "unexpected transformation!")
 
-            with it("raises StopIterations for empty iterables") as test:
-                with test.assertRaises(StopIteration):
-                    next(iter([]))
+    def dump(self, node):
+        print(
+            "\n--- Dumping Node ---\n",
+            ast.dump(node),
+            "\n--- End ---",
+            sep="\n"
+        )
 
-        with describe(range) as it:
-            with it("builds a range of integers") as test:
-                test.assertEqual(range(3), [0, 1, 2])
+    def execute(self, source):
+        self.globals, self.locals = {}, {}
+        self.node = ast.parse(dedent(source))
+        self.transformed = self.transformer.transform(self.node)
+        compiled = compile(self.transformed, "<testing transform>", "exec")
+
+        try:
+            exec(compiled, self.globals, self.locals)
+        except Exception:
+            self.dump(self.transformed)
+            raise
+
+    def test_it_fixes_missing_linenos(self):
+        fix = self.patchObject(transform.ast, "fix_missing_locations")
+        node = ast.Pass()
+        self.transformer.transform(node)
+        fix.assert_called_once_with(node)
+
+    def test_it_transforms_ivoire_imports_to_unittest(self):
+        self.execute("from ivoire import describe")
+        self.assertEqual(self.locals, {"TestCase" : TestCase})
+
+    def test_it_does_not_transform_other_imports_to_unittest(self):
+        self.assertNotTransformed("from textwrap import dedent")
+
+    def test_it_transforms_uses_of_describe_to_test_cases(self):
+        self.execute("""
+            from ivoire import describe
+            with describe(next) as it:
+                with it("returns the next element") as test:
+                    test.assertEqual(next(iter([1, 2, 3])), 1)
+        """)
+
+        TestNext = self.locals["TestNext"]
+
+    def test_it_does_not_transform_other_context_managers(self):
+        self.assertNotTransformed("""
+            from warnings import catchwarnings
+            with catchwarnings() as thing:
+                with catchwarnings():
+                    pass
         """)

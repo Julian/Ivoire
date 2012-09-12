@@ -6,7 +6,64 @@ from ivoire.util import is_spec
 
 
 class ExampleTransformer(ast.NodeTransformer):
-    pass
+    """
+    Transform a module that uses Ivoire into one that uses unittest.
+
+    This is highly experimental, and certain to have bugs (including some
+    known ones). Right now it is highly strict and will not properly transform
+    all possibilities. File issues if you find things that are wrong.
+
+    Note: None of the methods on this object are public API other than the
+    ``transform`` method.
+
+    """
+
+    def transform(self, node):
+        transformed = self.visit(node)
+        ast.fix_missing_locations(transformed)
+        return transformed
+
+    def visit_ImportFrom(self, node):
+        if node.module == "ivoire":
+            node.module = "unittest"
+            node.names[0].name = "TestCase"
+        return node
+
+    def visit_With(self, node):
+        """
+        with describe(thing) as it:
+            ...
+
+             |
+             v
+
+        class TestThing(TestCase):
+            ...
+
+        """
+
+        withitem, = node.items
+        context = withitem.context_expr
+
+        if context.func.id == "describe":
+            return self.transform_describe(context)
+        else:
+            return node
+
+    def transform_describe(self, context):
+        describes = context.args[0].id
+        test_case_name = "Test" + describes.title()
+
+        return ast.ClassDef(
+            name=test_case_name,
+            bases=[ast.Name(id="TestCase", ctx=ast.Load())],
+            keywords=[],
+            starargs=None,
+            kwargs=None,
+            body=[ast.Pass()],
+            decorator_list=[],
+        )
+
 
 
 class ExampleImporter(importlib.machinery.SourceFileLoader):
@@ -35,15 +92,6 @@ class ExampleImporter(importlib.machinery.SourceFileLoader):
 
     def find_module(self, fullname, path=None):
         return self
-
-    def transform(self, source):
-        """
-        Transform all the ``ExampleGroup``s and ``Example``s in the source.
-
-        """
-
-        node = ast.parse(source)
-        return ExampleTransformer().visit(node)
 
 
 def load(path):
