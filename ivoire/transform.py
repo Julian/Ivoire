@@ -1,14 +1,19 @@
+import ast
 import importlib.machinery
 import sys
 
 from ivoire.util import is_spec
 
 
-class IvoireImporter(importlib.machinery.SourceFileLoader):
+class ExampleTransformer(ast.NodeTransformer):
+    pass
+
+
+class ExampleImporter(importlib.machinery.SourceFileLoader):
     def __init__(self, fullname, path, *args, **kwargs):
         if not is_spec(path):
             raise ImportError()
-        super(IvoireImporter, self).__init__(fullname, path, *args, **kwargs)
+        super(ExampleImporter, self).__init__(fullname, path, *args, **kwargs)
 
     @classmethod
     def register(cls):
@@ -31,6 +36,15 @@ class IvoireImporter(importlib.machinery.SourceFileLoader):
     def find_module(self, fullname, path=None):
         return self
 
+    def transform(self, source):
+        """
+        Transform all the ``ExampleGroup``s and ``Example``s in the source.
+
+        """
+
+        node = ast.parse(source)
+        return ExampleTransformer().visit(node)
+
 
 def load(path):
     """
@@ -40,4 +54,4 @@ def load(path):
 
     """
 
-    return IvoireImporter(path).load_module(path)
+    return ExampleImporter(path).load_module(path)
