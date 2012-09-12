@@ -43,7 +43,7 @@ class Example(TestCase):
         if exc_type is None:
             self.__result.addSuccess(self)
         elif exc_type == KeyboardInterrupt:
-            raise
+            return False
         elif exc_type == self.failureException:
             self.__result.addFailure(self, (exc_type, exc_value, traceback))
         else:

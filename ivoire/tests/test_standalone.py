@@ -101,13 +101,6 @@ class TestDescribeTests(TestCase, PatchMixin):
                 mock.call.stopTest(test),
         ])
 
-
-    from unittest import skipIf
-    import platform
-    @skipIf(
-        "PyPy" == platform.python_implementation(),
-        "https://bugs.pypy.org/issue1260",
-    )
     def test_it_does_not_swallow_KeyboardInterrupts(self):
         with self.assertRaises(KeyboardInterrupt):
             with self.it as it:
