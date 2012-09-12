@@ -8,33 +8,34 @@ Is this a good idea?
 
 I don't know! I think it's interesting. I also think it should be done in a way
 that doesn't require too much investment and risk, which is why I chose to do
-it in a way that can be transparently (or explicitly if necessary) translated
-back into "normal" ``unittest.TestCase``\s.
+it in a way that also can be transparently (or explicitly if necessary) 
+translated back into "normal" ``unittest.TestCase``\s, so that existing tools
+can make use of the specs.
 
-I think the latter is also a good demo of what you can do with import hooks
-(path hooks), which can be confusing or magick-y but hopefully also do some
-good.
+For what it's worth, I think the latter is also a good demo of a simple thing
+you can do with import hooks (path hooks), which can be confusing or magick-y 
+but hopefully also do some good.
 
 To be a bit more specific, I like the renaming and refocusing that BDD tries to
 promote, and that's a thing that just adding new vocabulary like ``describe``
 and ``it`` can accomplish in a small way. That being said, Python isn't
 as suited for writing DSLs in it's own syntax as much as Ruby is.
 
-In ``Ivoire``'s standalone mode this means that tests suffer from some pretty
-big problems if you're not careful: Since ``with`` statements don't introduce
-new scopes, your tests aren't isolated at the language level from each other.
-So be careful. This is a non-issue in transformation mode, thankfully (though
-that has other smaller disadvantages).
+In Ivoire's standalone mode this means that specs suffer from some pretty big
+problems if you're not careful. Since ``with`` statements don't introduce
+new scopes, your tests aren't isolated at the language level from each other,
+so you need to be extra careful there. This is a non-issue in transformation
+mode, thankfully (though that has other smaller disadvantages).
 
 
 Why does it only support transformation in Python 3.3?
 ------------------------------------------------------
 
-Mostly since the Python import stack has mostly been done and redone a few
-times over its lifetime, most recently in the form of ``importlib``. Python
-3.3 has a bunch of useful things that make it easy to do what ``Ivoire`` needs
-to do. Until I get a chance to try out the backports of it, it's going to need
-to be Python 3.3+.
+Mostly since the Python import stack has been done and redone a few times over
+its lifetime, most recently in the form of ``importlib``. Python 3.3 has a 
+bunch of useful things that make it easy to do what Ivoire needs to do without
+reimplementing things like ``__import__``. So, until I get a chance to try out
+the backports of ``importlib``, it's going to need to be Python 3.3+ for that.
 
 
 This isn't like RSpec.
@@ -43,7 +44,7 @@ This isn't like RSpec.
 You're right, it probably isn't. To be honest, I haven't used RSpec much
 personally, but I respect that it makes a few Ruby programmers I know excited
 about testing, and I also like the way its tests look, so I figure there may be
-some benefit in having something that imitates it in some small way.
+some benefit in having something that imitates it in even some small way.
 
 If there's something specific that you think should be implemented though, feel
 free to implement or suggest it!
@@ -83,5 +84,5 @@ able to find one.
 How come the README doesn't have some cool lineart in it?
 ---------------------------------------------------------
 
-I don't know but if you have one please send it over, I love me a good piece of
-lineart as much as the next guy.
+I don't know but if you have some please send it over. I love me a good piece
+of lineart as much as the next guy.
