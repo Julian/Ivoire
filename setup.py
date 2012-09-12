@@ -34,7 +34,7 @@ setup(
     author="Julian Berman",
     author_email="Julian@GrayVines.com",
     classifiers=classifiers,
-    description="A simple RSpec-like wrapper and translator for unit testing.",
+    description="A simple RSpec-like testing framework.",
     license="MIT/X",
     long_description=long_description,
     url="http://github.com/Julian/Ivoire",
