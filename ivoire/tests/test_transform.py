@@ -1,5 +1,5 @@
 from textwrap import dedent
-from unittest import TestCase
+from unittest import TestCase, TestLoader
 import ast
 
 from ivoire import transform
@@ -104,10 +104,14 @@ class TestExampleTransformer(TestCase, PatchMixin):
             from ivoire import describe
             with describe(next) as it:
                 with it("returns the next element") as test:
-                    test.assertEqual(next(iter([1, 2, 3])), 1)
+                    test.i = [1, 2, 3]
+                    test.assertEqual(next(test.i), 1)
         """)
 
         TestNext = self.locals["TestNext"]
+        test = TestNext("test_it_returns_the_next_element")
+        test.run()
+        self.assertEqual(test.i, [1, 2, 3])
 
     def test_it_does_not_transform_other_context_managers(self):
         self.assertNotTransformed("""

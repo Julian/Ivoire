@@ -46,24 +46,110 @@ class ExampleTransformer(ast.NodeTransformer):
         context = withitem.context_expr
 
         if context.func.id == "describe":
-            return self.transform_describe(context)
+            describes = context.args[0].id
+            example_group_name = withitem.optional_vars.id
+            return self.transform_describe(node, describes, example_group_name)
         else:
             return node
 
-    def transform_describe(self, context):
-        describes = context.args[0].id
-        test_case_name = "Test" + describes.title()
+    def transform_describe(self, node, describes, context_variable):
+        """
+        Transform a describe node into a ``TestCase``.
 
+        ``node`` is the node object.
+        ``describes`` is the name of the object being described.
+        ``context_variable`` is the name bound in the context manager (usually
+        "it").
+
+        """
+
+        body = self.transform_describe_body(node.body, context_variable)
         return ast.ClassDef(
-            name=test_case_name,
+            name="Test" + describes.title(),
             bases=[ast.Name(id="TestCase", ctx=ast.Load())],
             keywords=[],
             starargs=None,
             kwargs=None,
-            body=[ast.Pass()],
+            body=list(body),
             decorator_list=[],
         )
 
+    def transform_describe_body(self, body, group_var):
+        """
+        Transform the body of an ``ExampleGroup``.
+
+        ``body`` is the body.
+        ``group_var`` is the name bound to the example group in the context
+        manager (usually "it").
+
+        """
+
+        for node in body:
+            withitem, = node.items
+            context_expr = withitem.context_expr
+
+            name = context_expr.args[0].s
+            context_var = withitem.optional_vars.id
+
+            yield self.transform_example(node, name, context_var, group_var)
+
+    def transform_example(self, node, name, context_variable, group_variable):
+        """
+        Transform an example node into a test method.
+
+        Returns the unchanged node if it wasn't an ``Example``.
+
+        ``node`` is the node object.
+        ``name`` is the name of the example being described.
+        ``context_variable`` is the name bound in the context manager (usually
+        "test").
+        ``group_variable`` is the name bound in the surrounding example group's
+        context manager (usually "it").
+
+        """
+
+        test_name = "_".join(["test", group_variable] + name.split())
+        body = self.transform_example_body(node.body, context_variable)
+
+        return ast.FunctionDef(
+            name=test_name,
+            args=self.takes_only_self(),
+            body=list(body),
+            decorator_list=[],
+        )
+
+    def transform_example_body(self, body, context_variable):
+        """
+        Transform the body of an ``Example`` into the body of a method.
+
+        Replaces instances of ``context_variable`` to refer to ``self``.
+
+        ``body`` is the body.
+        ``context_variable`` is the name bound in the surrounding context
+        manager to the example (usually "test").
+
+        """
+
+        for node in body:
+            for child in ast.walk(node):
+                if isinstance(child, ast.Name):
+                    if child.id == context_variable:
+                        child.id = "self"
+            yield node
+
+
+    def takes_only_self(self):
+        """
+        Return an argument list node that takes only ``self``.
+
+        """
+
+        return ast.arguments(
+            args=[ast.arg(arg="self")],
+            defaults=[],
+            kw_defaults=[],
+            kwonlyargs=[],
+        )
 
 
 class ExampleImporter(importlib.machinery.SourceFileLoader):
