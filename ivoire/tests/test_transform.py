@@ -40,19 +40,18 @@ class TestInstallUninstall(TestCase, PatchMixin):
 class TestFindModules(TestCase, PatchMixin):
     def setUp(self):
         self.is_spec = self.patchObject(transform, "is_spec")
-        self.module = "a_module"
 
     def test_finds_ivoire_modules(self):
         self.is_spec.return_value = True
-        importer = transform.ExampleImporter(self.module, FAKE_PATH)
+        importer = transform.ExampleImporter(FAKE_PATH)
 
     def test_does_not_find_non_ivoire_modules(self):
         self.is_spec.return_value = False
         with self.assertRaises(ImportError):
-            importer = transform.ExampleImporter(self.module, FAKE_PATH)
+            importer = transform.ExampleImporter(FAKE_PATH)
 
     def test_importer_is_also_the_loader(self):
-        importer = transform.ExampleImporter(self.module, FAKE_PATH)
+        importer = transform.ExampleImporter(FAKE_PATH)
         loader = importer.find_module("a.module")
         self.assertEqual(loader, importer)
 

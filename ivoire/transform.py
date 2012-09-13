@@ -158,11 +158,10 @@ class ExampleTransformer(ast.NodeTransformer):
         )
 
 
-class ExampleImporter(SourceFileLoader):
-    def __init__(self, fullname, path, *args, **kwargs):
+class ExampleImporter(object):
+    def __init__(self, path):
         if not is_spec(path):
             raise ImportError()
-        super(ExampleImporter, self).__init__(fullname, path, *args, **kwargs)
 
     @classmethod
     def register(cls):
