@@ -1,6 +1,12 @@
 import ast
-import importlib.machinery
 import sys
+
+try:
+    from importlib.machinery import SourceFileLoader
+except AttributeError:
+    raise ImportError(
+        "SourceFileLoader is not present in this version of Python."
+    )
 
 from ivoire.util import is_spec
 
@@ -152,7 +158,7 @@ class ExampleTransformer(ast.NodeTransformer):
         )
 
 
-class ExampleImporter(importlib.machinery.SourceFileLoader):
+class ExampleImporter(SourceFileLoader):
     def __init__(self, fullname, path, *args, **kwargs):
         if not is_spec(path):
             raise ImportError()

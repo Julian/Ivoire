@@ -9,7 +9,7 @@ import ivoire
 
 try:
     from ivoire.transform import ExampleImporter
-except (AttributeError, ImportError):
+except ImportError:
     ExampleImporter = None
 
 
