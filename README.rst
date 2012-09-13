@@ -17,6 +17,10 @@ Installation
 Ivoire is on `PyPi <http://pypi.python.org/pypi/ivoire>`_ and can be installed
 via ``pip install ivoire`` (or via your preferred installation method).
 
+At this point you should consider Ivoire to be experimental, and there are
+likely plenty of bugs to address, so please file them as you run into them on
+the `issue tracker <https://github.com/Julian/Ivoire/issues>`_.
+
 
 A Small Example
 ---------------
