@@ -66,7 +66,7 @@ class TestExampleTransformer(TestCase, PatchMixin):
         transformed = self.transformer.transform(node)
         self.assertIs(node, transformed, "unexpected transformation!")
 
-    def dump(self, node):
+    def dump(self, node):  # pragma: no cover
         print(
             "\n--- Dumping Node ---\n",
             ast.dump(node),
@@ -82,7 +82,7 @@ class TestExampleTransformer(TestCase, PatchMixin):
 
         try:
             exec(compiled, self.globals, self.locals)
-        except Exception:
+        except Exception:  # pragma: no cover
             self.dump(self.transformed)
             raise
 
