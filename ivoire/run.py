@@ -1,10 +1,16 @@
 import argparse
 import imp
 import os.path
+import runpy
 import sys
 
 from ivoire import result
 import ivoire
+
+try:
+    from ivoire.transform import ExampleImporter
+except (AttributeError, ImportError):
+    ExampleImporter = None
 
 
 def should_color(when):
@@ -19,6 +25,12 @@ def should_color(when):
 
 
 parser = argparse.ArgumentParser(description="The Ivoire test runner.")
+parser.add_argument(
+    "transform",
+    nargs=argparse.REMAINDER,
+    help="Run an Ivoire spec through another test runner by translating its "
+         "source code.",
+)
 parser.add_argument("FilePathsOrFQNs", nargs="+")
 parser.add_argument(
     "--color",
@@ -52,7 +64,6 @@ def setup(config):
     ivoire.current_result = current_result
 
 
-
 def run(config):
     """
     Time to run.
@@ -71,7 +82,22 @@ def run(config):
     ivoire.current_result.stopTestRun()
 
 
+def transform(config):
+    """
+    Run in transform mode.
+
+    """
+
+    if ExampleImporter is not None:
+        ExampleImporter.register()
+        return runpy.run_path(config.FilePathsOrFQNs[0])
+
+
 def main(arguments=None):
     arguments = parser.parse_args(arguments)
     setup(arguments)
-    run(arguments)
+
+    if arguments.transform:
+        transform(arguments)
+    else:
+        run(arguments)

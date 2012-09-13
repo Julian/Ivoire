@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, skipIf
 
 import ivoire
 from ivoire import result, run
@@ -46,15 +46,47 @@ class TestSetup(TestCase, PatchMixin):
 
 
 class TestMain(TestCase, PatchMixin):
+    def setUp(self):
+        self.arguments = mock.Mock()
+        self.parser = self.patchObject(run, "parser")
+        self.setup = self.patchObject(run, "setup")
+        self.run = self.patchObject(run, "run")
+        self.transform = self.patchObject(run, "transform")
+
+    def test_transform(self):
+        self.parser.parse_args.return_value.transform = True
+        run.main(self.arguments)
+        self.setup.assert_called_once_with(self.parser.parse_args.return_value)
+        self.transform.assert_called_once_with(
+            self.parser.parse_args.return_value
+        )
+
     def test_runs_setup_and_run(self):
-        self.patchObject(run, "parser")
-        self.patchObject(run, "setup")
-        self.patchObject(run, "run")
+        self.parser.parse_args.return_value.transform = False
+        run.main(self.arguments)
+        self.setup.assert_called_once_with(self.parser.parse_args.return_value)
+        self.run.assert_called_once_with(self.parser.parse_args.return_value)
 
-        run.main(["foo"])
 
-        run.setup.assert_called_once_with(run.parser.parse_args.return_value)
-        run.run.assert_called_once_with(run.parser.parse_args.return_value)
+@skipIf(
+    run.ExampleImporter is None, "Transformation not enabled."
+)
+class TestTransform(TestCase, PatchMixin):
+    def setUp(self):
+        self.path = "a/path"
+        self.config = mock.Mock()
+        self.config.transform = True
+        self.config.FilePathsOrFQNs = [self.path]
+        self.run_path = self.patchObject(run.runpy, "run_path")
+
+    def test_sets_up_path_hook(self):
+        ExampleImporter = self.patchObject(run, "ExampleImporter")
+        run.transform(self.config)
+        ExampleImporter.register.assert_called_once_with()
+
+    def test_runs_the_script(self):
+        run.transform(self.config)
+        self.run_path.assert_called_once_with(self.path)
 
 
 class TestRun(TestCase, PatchMixin):
