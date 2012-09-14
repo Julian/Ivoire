@@ -1,12 +1,8 @@
 import ast
 import sys
 
-try:
-    from importlib.machinery import FileFinder, SourceFileLoader
-except (AttributeError, ImportError):
-    FileFinder = SourceFileLoader = None
-finally:
-    possible = SourceFileLoader is not None   # is transformation possible?
+
+from ivoire.compat import FileFinder, SourceFileLoader, transform_possible
 
 
 class ExampleTransformer(ast.NodeTransformer):
@@ -156,7 +152,7 @@ class ExampleTransformer(ast.NodeTransformer):
         )
 
 
-class ExampleLoader(object):
+class ExampleLoader(SourceFileLoader):
 
     suffix = "_spec.py"
 
@@ -178,6 +174,16 @@ class ExampleLoader(object):
         """
 
         sys.path_hooks.remove(cls._finder)
+
+    def source_to_code(self, source_bytes, source_path):
+        """
+        Transform the source code, then return the code object.
+
+        """
+
+        node = ast.parse(source_bytes)
+        transformed = ExampleTransformer().transform(node)
+        return compile(transformed, source_path, "exec", dont_inherit=True)
 
 
 def load_spec(path):

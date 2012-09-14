@@ -7,7 +7,7 @@ import sys
 from ivoire import result
 import ivoire
 
-from ivoire.transform import ExampleLoader, possible as transform_possible
+from ivoire.transform import ExampleLoader, transform_possible
 
 
 def should_color(when):

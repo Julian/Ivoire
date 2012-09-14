@@ -1,3 +1,8 @@
+"""
+Various crude backports (mostly direct copying) of things from later versions.
+
+"""
+
 try:
     from textwrap import indent
 except ImportError:
@@ -19,3 +24,16 @@ except ImportError:
             for line in text.splitlines(True):
                 yield (prefix + line if predicate(line) else line)
         return ''.join(prefixed_lines())
+
+
+try:
+    from importlib.machinery import FileFinder, SourceFileLoader
+except (AttributeError, ImportError):
+    FileFinder = SourceFileLoader = object
+else:
+    if not hasattr(SourceFileLoader, "source_to_code"):  # pre-3.4
+        class SourceFileLoader(SourceFileLoader):
+            def source_to_code(self, source_bytes, source_path):
+                pass
+finally:
+    transform_possible = SourceFileLoader is not object

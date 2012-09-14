@@ -44,6 +44,29 @@ class TestRegistration(TestCase, PatchMixin):
         self.assertEqual(self.path_hooks, list(self.hooks))
 
 
+class TestExampleLoader(TestCase, PatchMixin):
+    @skipIf(
+        not transform.transform_possible,
+        "Transformation isn't supported yet on this version.",
+    )
+    def test_it_transforms_the_source(self):
+        trans = self.patchObject(transform.ExampleTransformer, "transform")
+        parse = self.patchObject(ast, "parse")
+        compile = self.patchObject(transform, "compile", create=True)
+
+        fullname, path = mock.Mock(), mock.Mock()
+        source, path = mock.Mock(), mock.Mock()
+
+        loader = transform.ExampleLoader(fullname, path)
+        code = loader.source_to_code(source, path)
+
+        self.assertEqual(code, compile.return_value)
+        compile.assert_called_once_with(
+            trans.return_value, path, "exec", dont_inherit=True
+        )
+        trans.assert_called_once_with(parse.return_value)
+
+
 class TestExampleTransformer(TestCase, PatchMixin):
     def setUp(self):
         self.transformer = transform.ExampleTransformer()
@@ -87,7 +110,7 @@ class TestExampleTransformer(TestCase, PatchMixin):
         self.assertNotTransformed("from textwrap import dedent")
 
     @skipIf(
-        not transform.possible,
+        not transform.transform_possible,
         "Transformation isn't supported yet on this version.",
     )
     def test_it_transforms_uses_of_describe_to_test_cases(self):
@@ -105,7 +128,7 @@ class TestExampleTransformer(TestCase, PatchMixin):
         self.assertEqual(test.i, [1, 2, 3])
 
     @skipIf(
-        not transform.possible,
+        not transform.transform_possible,
         "Transformation isn't supported yet on this version.",
     )
     def test_it_does_not_transform_other_context_managers(self):
