@@ -69,7 +69,7 @@ others.
 After installing Ivoire, running the example above with 
 ``ivoire examples/calculator_spec.py`` should produce:
 
-.. image:: https://github.com/Julian/Ivoire/raw/master/examples/calculator_spec_output.png
+.. image:: https://github.com/Julian/Ivoire/raw/master/examples/img/calculator_spec_output.png
     :alt: spec output
     :align: center
 
