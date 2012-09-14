@@ -7,10 +7,7 @@ import sys
 from ivoire import result
 import ivoire
 
-try:
-    from ivoire.transform import ExampleImporter
-except ImportError:
-    ExampleImporter = None
+from ivoire.transform import ExampleLoader, possible as transform_possible
 
 
 def should_color(when):
@@ -85,8 +82,8 @@ def transform(config):
 
     """
 
-    if ExampleImporter is not None:
-        ExampleImporter.register()
+    if transform_possible:
+        ExampleLoader.register()
         return runpy.run_path(config.runner)
 
 

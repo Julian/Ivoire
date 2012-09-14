@@ -7,19 +7,16 @@ from ivoire import transform
 from ivoire.tests.util import PatchMixin, mock
 
 
-FAKE_PATH = "a/path"
-
-
 class TestLoad(TestCase, PatchMixin):
     def test_load_module_is_exposed_globally(self):
-        ExampleImporter = self.patchObject(transform, "ExampleImporter")
-        path = FAKE_PATH
+        ExampleLoader = self.patchObject(transform, "ExampleLoader")
+        path = "dummy/path"
 
-        module = transform.load(path)
+        module = transform.load_spec(path)
 
-        ExampleImporter.assert_called_once_with(path)
+        ExampleLoader.assert_called_once_with(path)
         self.assertEqual(
-            module, ExampleImporter.return_value.load_module.return_value,
+            module, ExampleLoader.return_value.load_module.return_value,
         )
 
 
@@ -29,32 +26,13 @@ class TestInstallUninstall(TestCase, PatchMixin):
 
     def test_adds_loader_to_path_hooks(self):
         self.path_hooks.append(next)
-        transform.ExampleImporter.register()
-        self.assertEqual(self.path_hooks, [next, transform.ExampleImporter])
+        transform.ExampleLoader.register()
+        self.assertEqual(self.path_hooks, [next, transform.ExampleLoader])
 
     def test_removes_loader_from_path_hooks(self):
-        self.path_hooks.extend([next, transform.ExampleImporter])
-        transform.ExampleImporter.unregister()
+        self.path_hooks.extend([next, transform.ExampleLoader])
+        transform.ExampleLoader.unregister()
         self.assertEqual(self.path_hooks, [next])
-
-
-class TestFindModules(TestCase, PatchMixin):
-    def setUp(self):
-        self.is_spec = self.patchObject(transform, "is_spec")
-
-    def test_finds_ivoire_modules(self):
-        self.is_spec.return_value = True
-        importer = transform.ExampleImporter(FAKE_PATH)
-
-    def test_does_not_find_non_ivoire_modules(self):
-        self.is_spec.return_value = False
-        with self.assertRaises(ImportError):
-            importer = transform.ExampleImporter(FAKE_PATH)
-
-    def test_importer_is_also_the_loader(self):
-        importer = transform.ExampleImporter(FAKE_PATH)
-        loader = importer.find_module("a.module")
-        self.assertEqual(loader, importer)
 
 
 class TestExampleTransformer(TestCase, PatchMixin):

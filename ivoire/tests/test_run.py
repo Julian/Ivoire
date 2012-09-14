@@ -72,26 +72,20 @@ class TestSetup(TestCase, PatchMixin):
         )
 
 
-@skipIf(
-    run.ExampleImporter is None, "Transformation not enabled."
-)
 class TestTransform(TestCase, PatchMixin):
     def setUp(self):
-        self.path = "a/path"
-        self.runner = "foo"
-        self.config = mock.Mock()
-        self.config.runner = self.runner
-        self.config.specs = [self.path]
+        self.patchObject(run, "transform_possible", True)
+        self.config = mock.Mock(runner="runner", specs=["a/spec.py"])
         self.run_path = self.patchObject(run.runpy, "run_path")
 
     def test_sets_up_path_hook(self):
-        ExampleImporter = self.patchObject(run, "ExampleImporter")
+        ExampleLoader = self.patchObject(run, "ExampleLoader")
         run.transform(self.config)
-        ExampleImporter.register.assert_called_once_with()
+        ExampleLoader.register.assert_called_once_with()
 
     def test_runs_the_script(self):
         run.transform(self.config)
-        self.run_path.assert_called_once_with(self.runner)
+        self.run_path.assert_called_once_with(self.config.runner)
 
 
 class TestRun(TestCase, PatchMixin):

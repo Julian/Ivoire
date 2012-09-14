@@ -8,8 +8,6 @@ except (AttributeError, ImportError):
 finally:
     possible = SourceFileLoader is not None   # is transformation possible?
 
-from ivoire.util import is_spec
-
 
 class ExampleTransformer(ast.NodeTransformer):
     """
@@ -158,11 +156,7 @@ class ExampleTransformer(ast.NodeTransformer):
         )
 
 
-class ExampleImporter(object):
-    def __init__(self, path):
-        if not is_spec(path):
-            raise ImportError()
-
+class ExampleLoader(object):
     @classmethod
     def register(cls):
         """
@@ -181,16 +175,13 @@ class ExampleImporter(object):
 
         sys.path_hooks.remove(cls)
 
-    def find_module(self, fullname, path=None):
-        return self
 
-
-def load(path):
+def load_spec(path):
     """
-    Load an ivoire module from the given path.
+    Load a spec from the given path.
 
     Returns the resulting transformed module.
 
     """
 
-    return ExampleImporter(path).load_module(path)
+    return ExampleLoader(path).load_module(path)
