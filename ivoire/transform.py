@@ -3,10 +3,10 @@ import sys
 
 try:
     from importlib.machinery import SourceFileLoader
-except AttributeError:
-    raise ImportError(
-        "SourceFileLoader is not present in this version of Python."
-    )
+except (AttributeError, ImportError):
+    SourceFileLoader = None
+finally:
+    possible = SourceFileLoader is not None   # is transformation possible?
 
 from ivoire.util import is_spec
 

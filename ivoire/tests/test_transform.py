@@ -1,5 +1,6 @@
+from __future__ import print_function
 from textwrap import dedent
-from unittest import TestCase, TestLoader
+from unittest import TestCase, TestLoader, skipIf
 import ast
 
 from ivoire import transform
@@ -98,6 +99,10 @@ class TestExampleTransformer(TestCase, PatchMixin):
     def test_it_does_not_transform_other_imports_to_unittest(self):
         self.assertNotTransformed("from textwrap import dedent")
 
+    @skipIf(
+        not transform.possible,
+        "Transformation isn't supported yet on this version.",
+    )
     def test_it_transforms_uses_of_describe_to_test_cases(self):
         self.execute("""
             from ivoire import describe
@@ -112,6 +117,10 @@ class TestExampleTransformer(TestCase, PatchMixin):
         test.run()
         self.assertEqual(test.i, [1, 2, 3])
 
+    @skipIf(
+        not transform.possible,
+        "Transformation isn't supported yet on this version.",
+    )
     def test_it_does_not_transform_other_context_managers(self):
         self.assertNotTransformed("""
             from warnings import catchwarnings
