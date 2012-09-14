@@ -3,7 +3,7 @@ from unittest import TestResult
 import sys
 import time
 
-from ivoire.util import indent
+from ivoire.compat import indent
 
 
 class ExampleResult(TestResult):

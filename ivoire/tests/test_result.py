@@ -4,7 +4,7 @@ from unittest import TestCase
 import sys
 
 from ivoire import result
-from ivoire.util import indent
+from ivoire.compat import indent
 from ivoire.tests.util import PatchMixin, mock
 
 
