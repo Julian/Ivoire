@@ -74,14 +74,14 @@ class TestSetup(TestCase, PatchMixin):
 
 class TestTransform(TestCase, PatchMixin):
     def setUp(self):
+        self.ExampleLoader = self.patchObject(run, "ExampleLoader")
         self.patchObject(run, "transform_possible", True)
         self.config = mock.Mock(runner="runner", specs=["a/spec.py"])
         self.run_path = self.patchObject(run.runpy, "run_path")
 
     def test_sets_up_path_hook(self):
-        ExampleLoader = self.patchObject(run, "ExampleLoader")
         run.transform(self.config)
-        ExampleLoader.register.assert_called_once_with()
+        self.ExampleLoader.register.assert_called_once_with()
 
     def test_runs_the_script(self):
         run.transform(self.config)

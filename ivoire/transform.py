@@ -2,9 +2,9 @@ import ast
 import sys
 
 try:
-    from importlib.machinery import SourceFileLoader
+    from importlib.machinery import FileFinder, SourceFileLoader
 except (AttributeError, ImportError):
-    SourceFileLoader = None
+    FileFinder = SourceFileLoader = None
 finally:
     possible = SourceFileLoader is not None   # is transformation possible?
 
@@ -157,6 +157,9 @@ class ExampleTransformer(ast.NodeTransformer):
 
 
 class ExampleLoader(object):
+
+    suffix = "_spec.py"
+
     @classmethod
     def register(cls):
         """
@@ -164,7 +167,8 @@ class ExampleLoader(object):
 
         """
 
-        sys.path_hooks.append(cls)
+        cls._finder = FileFinder.path_hook((cls, [cls.suffix]))
+        sys.path_hooks.append(cls._finder)
 
     @classmethod
     def unregister(cls):
@@ -173,7 +177,7 @@ class ExampleLoader(object):
 
         """
 
-        sys.path_hooks.remove(cls)
+        sys.path_hooks.remove(cls._finder)
 
 
 def load_spec(path):

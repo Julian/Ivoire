@@ -20,19 +20,28 @@ class TestLoad(TestCase, PatchMixin):
         )
 
 
-class TestInstallUninstall(TestCase, PatchMixin):
+class TestRegistration(TestCase, PatchMixin):
     def setUp(self):
-        self.path_hooks = self.patchObject(transform.sys, "path_hooks", [])
+        self.FileFinder = self.patchObject(transform, "FileFinder")
+        self.hooks = ()
+        self.path_hooks = self.patchObject(
+            transform.sys, "path_hooks", list(self.hooks)
+        )
 
-    def test_adds_loader_to_path_hooks(self):
-        self.path_hooks.append(next)
+    def test_it_registers_a_file_finder(self):
         transform.ExampleLoader.register()
-        self.assertEqual(self.path_hooks, [next, transform.ExampleLoader])
+        self.assertEqual(
+            self.path_hooks,
+            list(self.hooks) + [self.FileFinder.path_hook.return_value],
+        )
+        self.FileFinder.path_hook.assert_called_once_with(
+            (transform.ExampleLoader, ["_spec.py"]),
+        )
 
-    def test_removes_loader_from_path_hooks(self):
-        self.path_hooks.extend([next, transform.ExampleLoader])
+    def test_it_unregisters_the_file_finder(self):
+        transform.ExampleLoader.register()
         transform.ExampleLoader.unregister()
-        self.assertEqual(self.path_hooks, [next])
+        self.assertEqual(self.path_hooks, list(self.hooks))
 
 
 class TestExampleTransformer(TestCase, PatchMixin):
