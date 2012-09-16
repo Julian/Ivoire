@@ -17,7 +17,7 @@ def should_color(when):
     """
 
     if when == "auto":
-        return sys.stdout.isatty()
+        return sys.stderr.isatty()
     return when == "always"
 
 
