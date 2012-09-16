@@ -69,6 +69,8 @@ def run(config):
 
     ivoire.current_result.stopTestRun()
 
+    sys.exit(not ivoire.current_result.wasSuccessful())
+
 
 def transform(config):
     """

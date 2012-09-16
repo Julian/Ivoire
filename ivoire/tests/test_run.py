@@ -78,6 +78,7 @@ class TestTransform(TestCase, PatchMixin):
 class TestRun(TestCase, PatchMixin):
     def setUp(self):
         self.config = mock.Mock(specs=[])
+        self.exit = self.patchObject(run.sys, "exit")
         self.result = self.patchObject(ivoire, "current_result")
 
     def test_it_respects_fail_fast(self):
