@@ -144,6 +144,11 @@ _transform.add_argument(
     help="Format colored output.",
 )
 _transform.add_argument(
+    "-v", "--verbose",
+    action="store_true",
+    help="Format verbose output.",
+)
+_transform.add_argument(
     "runner",
     help="The command to run the transformed tests with."
 )
