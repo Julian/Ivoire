@@ -5,6 +5,70 @@ from ivoire import result, run
 from ivoire.tests.util import PatchMixin, mock
 
 
+class TestLoadByName(TestCase, PatchMixin):
+    def setUp(self):
+        self.path_exists = self.patchObject(run.os.path, "exists")
+
+    def test_loads_paths(self):
+        self.path_exists.return_value = True
+        load_path = self.patchObject(run, "load_from_path")
+        run.load_by_name("foo")
+        load_path.assert_called_once_with("foo")
+
+    def test_loads_modules(self):
+        self.path_exists.return_value = False
+        importfn = self.patchObject(run, "__import__", create=True)
+        run.load_by_name("foo")
+        importfn.assert_called_once_with("foo")
+
+
+class TestLoadPath(TestCase, PatchMixin):
+    def setUp(self):
+        self.isdir = self.patchObject(run.os.path, "isdir")
+        self.load_source = self.patchObject(run.imp, "load_source")
+        self.path = "foo/bar"
+
+    def test_it_discovers_specs_if_given_a_directory(self):
+        self.isdir.return_value = True
+        specs = ["foo/bar", "bar/baz", "baz/quux"]
+        discover = self.patchObject(run, "discover", return_value=specs)
+
+        run.load_from_path(self.path)
+
+        self.assertEqual(self.load_source.mock_calls, [
+            mock.call("bar", "foo/bar"),
+            mock.call("baz", "bar/baz"),
+            mock.call("quux", "baz/quux"),
+        ])
+
+    def test_it_loads_paths(self):
+        self.isdir.return_value = False
+        run.load_from_path(self.path)
+        self.load_source.assert_called_once_with("bar", self.path)
+
+
+class TestDiscovery(TestCase, PatchMixin):
+    def test_filters_specs(self):
+        files = ["a.py", "dir/b.py", "dir/c_spec.py", "d_spec.py"]
+        specs = run.filter_specs(files)
+        self.assertEqual(specs, ["dir/c_spec.py", "d_spec.py"])
+
+    def test_discover(self):
+        subdirs = mock.Mock()
+        files, more_files = [mock.Mock()], [mock.Mock(), mock.Mock()]
+
+        tree = [("dir", subdirs, files), ("dir/child", subdirs, more_files)]
+        walk = self.patchObject(run.os, "walk", return_value=tree)
+
+        no_filter = mock.Mock(side_effect=lambda paths : paths)
+
+        specs = list(run.discover("a/path", filter_specs=no_filter))
+
+        self.assertEqual(specs, files + more_files)
+        self.assertTrue(no_filter.called)
+        walk.assert_called_once_with("a/path")
+
+
 class TestParser(TestCase, PatchMixin):
     def test_colored_auto_by_default(self):
         should_color = self.patchObject(run, "should_color")
@@ -105,15 +169,14 @@ class TestRun(TestCase, PatchMixin):
         self.result.startTestRun.assert_called_once_with()
         self.result.stopTestRun.assert_called_once_with()
 
-    def test_parses_and_loads_specs(self):
-        self.config.specs = ["foo.bar", "foo/bar/baz.py", "foo"]
-
+    def test_it_loads_specs(self):
+        load_by_name = self.patchObject(run, "load_by_name")
+        self.config.specs = [mock.Mock(), mock.Mock(), mock.Mock()]
         run.run(self.config)
-
         self.assertEqual(
-            self.importfn.mock_calls, [mock.call("foo.bar"), mock.call("foo")],
+            load_by_name.mock_calls,
+            [mock.call(spec) for spec in self.config.specs],
         )
-        self.imp.load_source.assert_called_once_with("baz", "foo/bar/baz.py")
 
 
 class TestMain(TestCase, PatchMixin):
