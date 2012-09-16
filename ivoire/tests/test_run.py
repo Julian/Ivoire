@@ -37,19 +37,6 @@ class TestParser(TestCase, PatchMixin):
         parse_args.assert_called_once_with(["run"])
 
 
-class TestColor(TestCase, PatchMixin):
-    def setUp(self):
-        self.stderr = self.patchObject(run.sys, "stderr")
-
-    def test_auto_is_always_when_connected_to_a_tty(self):
-        self.stderr.isatty.return_value = True
-        self.assertTrue(run.should_color("auto"))
-
-    def test_auto_is_never_otherwise(self):
-        self.stderr.isatty.return_value = False
-        self.assertFalse(run.should_color("auto"))
-
-
 class TestSetup(TestCase, PatchMixin):
     def setUp(self):
         self.patchObject(ivoire, "current_result", None)
