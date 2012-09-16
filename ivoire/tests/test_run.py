@@ -6,6 +6,15 @@ from ivoire.tests.util import PatchMixin, mock
 
 
 class TestParser(TestCase, PatchMixin):
+    def test_dots_by_default(self):
+        should_color = self.patchObject(run, "should_color")
+        arguments = run.parse(["foo"])
+        self.assertEqual(arguments.Formatter, result.Formatter)
+
+    def test_not_verbose_by_default(self):
+        arguments = run.parse(["foo"])
+        self.assertFalse(arguments.verbose)
+
     def test_colored_auto_by_default(self):
         should_color = self.patchObject(run, "should_color")
         arguments = run.parse(["foo"])
@@ -16,6 +25,14 @@ class TestParser(TestCase, PatchMixin):
         arguments = run.parse(["--color=auto", "foo"])
         self.assertEqual(arguments.color, should_color.return_value)
         should_color.assert_called_once_with("auto")
+
+    def test_not_exitfirst_by_default(self):
+        arguments = run.parse(["foo"])
+        self.assertFalse(arguments.exitfirst)
+
+    def test_exitfirst(self):
+        arguments = run.parse(["--exitfirst", "foo"])
+        self.assertTrue(arguments.exitfirst)
 
     def test_no_transform(self):
         arguments = run.parse(["foo", "bar"])
@@ -40,18 +57,23 @@ class TestParser(TestCase, PatchMixin):
 class TestSetup(TestCase, PatchMixin):
     def setUp(self):
         self.patchObject(ivoire, "current_result", None)
-        self.config = mock.Mock()
+        self.config = mock.Mock(verbose=False, color=False)
 
     def test_it_sets_a_result(self):
         run.setup(self.config)
         self.assertIsNotNone(ivoire.current_result)
+
+    def test_verbose(self):
+        self.config.verbose = True
+        run.setup(self.config)
+        self.assertIsInstance(ivoire.current_result.formatter, result.Verbose)
 
     def test_colored(self):
         self.config.color = True
         run.setup(self.config)
         self.assertIsInstance(ivoire.current_result.formatter, result.Colored)
 
-    def test_uncolored(self):
+    def test_plain(self):
         self.config.color = False
         run.setup(self.config)
         self.assertIsInstance(

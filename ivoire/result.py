@@ -204,3 +204,43 @@ class Formatter(FormatterMixin):
         """
 
         return "\n".join((str(example), traceback))
+
+
+class Verbose(FormatterMixin):
+    """
+    Show verbose output (including example and group descriptions.
+
+    """
+
+    _last_group = None
+
+    def __init__(self, formatter):
+        self._formatter = formatter
+
+    def __getattr__(self, attr):
+        return getattr(self._formatter, attr)
+
+    def finished(self):
+        self.show("\n")
+
+    def error(self, example, exc_info):
+        self.maybe_show_group(example.group)
+        return indent(str(example), 4 * " ") + " - ERROR\n"
+
+    def failure(self, example, exc_info):
+        self.maybe_show_group(example.group)
+        return indent(str(example), 4 * " ") + " - FAIL\n"
+
+    def success(self, example):
+        self.maybe_show_group(example.group)
+        return indent(str(example), 4 * " ") + "\n"
+
+    def maybe_show_group(self, group):
+        """
+        Show the given example group if it is different than the last seen.
+
+        """
+
+        if group != self._last_group:
+            self.show(str(group) + "\n")
+        self._last_group = group

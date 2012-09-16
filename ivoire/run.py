@@ -8,6 +8,11 @@ from ivoire.transform import ExampleLoader, transform_possible
 import ivoire
 
 
+FORMATTERS = {
+    "dots" : result.Formatter,
+}
+
+
 def should_color(when):
     """
     Decide whether to color output.
@@ -45,6 +50,8 @@ def setup(config):
 
     formatter = result.Formatter()
 
+    if config.verbose:
+        formatter = result.Verbose(formatter)
     if config.color:
         formatter = result.Colored(formatter)
 
@@ -104,7 +111,21 @@ _run.add_argument(
     help="Format colored output.",
 )
 _run.add_argument(
-    "-x", "--exitfirst", default=False, dest="exitfirst",
+    "-f", "--formatter",
+    choices=FORMATTERS,
+    default="dots",
+    dest="Formatter",
+    type=lambda formatter : FORMATTERS[formatter],
+    help="Format output with the given formatter.",
+)
+_run.add_argument(
+    "-v", "--verbose",
+    action="store_true",
+    help="Format verbose output.",
+)
+_run.add_argument(
+    "-x", "--exitfirst",
+    action="store_true",
     help="Exit after the first error or failure.",
 )
 _run.add_argument("specs", nargs="+")
