@@ -89,7 +89,7 @@ Contributing
 
 I'm Julian Berman.
 
-You can find me on Freenode in ``#python`` and various other channels
+You can find me on Freenode in ``#python-testing`` and various other channels
 (nick: ``tos9``) if you'd like to chat, or if there's enough interest in such a
 thing, in ``##ivoire``.
 
