@@ -1,10 +1,8 @@
 from __future__ import unicode_literals
-from unittest import TestCase, TestResult, TestSuite
-import collections
-import contextlib
+from unittest import TestCase, TestResult
+import sys
 
 import ivoire
-from ivoire.result import ExampleResult, Formatter
 
 
 class _ShouldStop(Exception):
@@ -22,7 +20,7 @@ class Example(TestCase):
 
     """
 
-    def __init__(self, name, group):
+    def __init__(self, name, group, before=None, after=None):
         result = self.__result = ivoire.current_result
 
         if result is None:
@@ -32,11 +30,23 @@ class Example(TestCase):
             )
 
         super(Example, self).__init__(_MAKE_UNITTEST_SHUT_UP)
+
+        self.__after = after
+        self.__before = before
         self.__group = group
         self.__name = name
 
     def __enter__(self):
         self.__result.startTest(self)
+
+        if self.__before is not None:
+            try:
+                self.__before(self)
+            except Exception:
+                self.__result.addError(self, sys.exc_info())
+                self.__result.stopTest(self)
+                raise _ShouldStop
+
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -48,6 +58,9 @@ class Example(TestCase):
             self.__result.addFailure(self, (exc_type, exc_value, traceback))
         else:
             self.__result.addError(self, (exc_type, exc_value, traceback))
+
+        if self.__after is not None:
+            self.__after(self)
 
         self.doCleanups()
         self.__result.stopTest(self)
@@ -75,6 +88,9 @@ class ExampleGroup(object):
     ``ExampleGroup``s group together a number of ``Example``s.
 
     """
+
+    _before = _after = None
+    failureException = None
 
     def __init__(self, describes, Example=Example):
         self.Example = Example
@@ -105,7 +121,13 @@ class ExampleGroup(object):
 
         """
 
-        example = self.Example(name=name, group=self)
+        example = self.Example(
+            name=name, group=self, before=self._before, after=self._after,
+        )
+
+        if self.failureException is not None:
+            example.failureException = self.failureException
+
         self.add_example(example)
         return example
 
@@ -116,6 +138,27 @@ class ExampleGroup(object):
         """
 
         self.examples.append(example)
+
+    def before(self, fn):
+        """
+        Run the given function before each example is run.
+
+        Note: In standalone mode, it's not possible to skip a context block,
+        so if a ``before`` function errors, the exception is propagated all the
+        way up to the ``ExampleGroup`` (meaning the rest of the examples *will
+        not run at all*, nor will they show up in the result output).
+
+        """
+
+        self._before = fn
+
+    def after(self, fn):
+        """
+        Run the given function after each example is run.
+
+        """
+
+        self._after = fn
 
     def countTestCases(self):
         return sum(example.countTestCases() for example in self)

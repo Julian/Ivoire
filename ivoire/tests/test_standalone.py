@@ -1,3 +1,13 @@
+"""
+Test the standalone running of Ivoire examples.
+
+A **warning** about testing in this module: Testing Ivoire Examples means
+testing a thing that is swallowing (and recording) *all* exceptions. Make sure
+all of your assertions are outside of example blocks so that they are handled
+by the surrounding test case.
+
+"""
+
 from __future__ import unicode_literals
 from unittest import TestCase
 import sys
@@ -17,6 +27,18 @@ class TestDescribe(TestCase, PatchMixin):
 
         it = ExampleGroup(describe, Example=OtherExample)
         self.assertEqual(it.Example, OtherExample)
+
+    def test_it_passes_failure_exceptions_along(self):
+        self.patchObject(ivoire, "current_result")
+        it = ExampleGroup(describe)
+        it.failureException = IndexError
+        self.assertEqual(it("set it").failureException, IndexError)
+
+    def test_it_does_not_pass_along_failureException_when_none_was_set(self):
+        self.patchObject(ivoire, "current_result")
+        it = ExampleGroup(describe)
+        self.assertIsNone(it.failureException)
+        self.assertIsNotNone(it("didn't set it").failureException)
 
 
 class TestDescribeTests(TestCase, PatchMixin):
@@ -107,11 +129,56 @@ class TestDescribeTests(TestCase, PatchMixin):
                 with it("does a thing") as test:
                     raise KeyboardInterrupt
 
+    def test_it_exits_the_group_if_begin_errors(self):
+        self.ran_test = False
+
+        with self.it as it:
+            @it.before
+            def before(test):
+                raise RuntimeError("Buggy before.")
+
+            example = it("should not be run")
+            with example as test:
+                self.ran_test = True
+
+        self.assertEqual(self.result.mock_calls, [
+            mock.call.startTest(example),
+            mock.call.addError(example, mock.ANY),  # traceback object
+            mock.call.stopTest(example),
+        ])
+        self.assertFalse(self.ran_test)
+
+    def test_it_runs_befores(self):
+        with self.it as it:
+            @it.before
+            def before(test):
+                test.foo = 12
+
+            with it("should have set foo") as test:
+                foo = test.foo
+        self.assertEqual(foo, 12)
+
+    # XXX: There's a few more cases here that should be tested
+
+    def test_it_runs_afters(self):
+        self.foo = None
+
+        with self.it as it:
+            @it.after
+            def after(test):
+                self.foo = 12
+
+            with it("should have set foo after") as test:
+                foo = self.foo
+
+        self.assertEqual(foo, None)
+        self.assertEqual(self.foo, 12)
+
     def test_it_runs_cleanups(self):
         with self.it as it:
             with it("does a thing") as test:
                 doCleanups = self.patchObject(test, "doCleanups")
-            self.assertTrue(doCleanups.called)
+        self.assertTrue(doCleanups.called)
 
     def test_it_respects_shouldStop(self):
         with self.it as it:
