@@ -36,3 +36,13 @@ with describe(run.run) as it:
         test.result.wasSuccessful.return_value = False
         run.run(test.config)
         test.exit.assert_called_once_with(1)
+
+    with it("logs an error to the result if an import fails") as test:
+        test.config.specs = ["does.not.exist"]
+        test.load_by_name.side_effect = IndexError
+
+        run.run(test.config)
+
+        (example, traceback), _ = test.result.addError.call_args
+        test.assertEqual(str(example), "<not in example>")
+        test.assertEqual(traceback[0], IndexError)

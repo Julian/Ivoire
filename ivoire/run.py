@@ -1,3 +1,8 @@
+"""
+The implementation of the Ivoire runner.
+
+"""
+
 import argparse
 import runpy
 import sys
@@ -11,6 +16,19 @@ import ivoire
 FORMATTERS = {
     "dots" : result.Formatter,
 }
+
+
+class _ExampleNotRunning(object):
+    """
+    An error occurred, but no example was running. Mimic an Example object.
+
+    """
+
+    failureException = None
+    group = None
+
+    def __str__(self):
+        return "<not in example>"
 
 
 def should_color(when):
@@ -79,7 +97,12 @@ def run(config):
     ivoire.current_result.startTestRun()
 
     for spec in config.specs:
-        load_by_name(spec)
+        try:
+            load_by_name(spec)
+        except Exception:
+            ivoire.current_result.addError(
+                _ExampleNotRunning(), sys.exc_info()
+            )
 
     ivoire.current_result.stopTestRun()
 
