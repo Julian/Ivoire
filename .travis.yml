@@ -7,4 +7,3 @@ install: python setup.py -q install
 script:
     - nosetests
     - ivoire ivoire
-    - ivoire transform `which nosetests` ivoire
