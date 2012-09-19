@@ -13,7 +13,7 @@ from unittest import TestCase
 import sys
 
 import ivoire
-from ivoire.standalone import Example, ExampleGroup, describe
+from ivoire.standalone import describe
 from ivoire.tests.util import PatchMixin, mock
 
 
@@ -22,8 +22,8 @@ class TestDescribeTests(TestCase, PatchMixin):
         self.result = self.patchObject(
             ivoire, "current_result", shouldStop=False
         )
-        self.describes = ExampleGroup
-        self.it = ExampleGroup(self.describes)
+        self.describes = describe
+        self.it = describe(self.describes)
 
     def test_it_adds_an_example(self):
         with self.it as it:
