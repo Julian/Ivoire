@@ -173,7 +173,7 @@ class TestColored(TestCase, PatchMixin):
         )
 
 
-class TestFormatter(TestCase, PatchMixin):
+class TestDotsFormatter(TestCase, PatchMixin):
     def setUp(self):
         self.elapsed = 1.23456789
         self.result = mock.Mock()
@@ -181,10 +181,10 @@ class TestFormatter(TestCase, PatchMixin):
         self.exc_info = fake_exc_info()
 
         self.stream = StringIO()
-        self.formatter = result.Formatter(self.stream)
+        self.formatter = result.DotsFormatter(self.stream)
 
     def test_it_writes_to_stderr_by_default(self):
-        self.assertEqual(result.Formatter().stream, sys.stderr)
+        self.assertEqual(result.DotsFormatter().stream, sys.stderr)
 
     def test_show_writes_and_flushes(self):
         self.stream.flush = mock.Mock()

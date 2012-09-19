@@ -9,7 +9,7 @@ class TestParser(TestCase, PatchMixin):
     def test_dots_by_default(self):
         should_color = self.patchObject(run, "should_color")
         arguments = run.parse(["foo"])
-        self.assertEqual(arguments.Formatter, result.Formatter)
+        self.assertEqual(arguments.Formatter, result.DotsFormatter)
 
     def test_not_verbose_by_default(self):
         arguments = run.parse(["foo"])

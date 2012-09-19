@@ -142,7 +142,7 @@ class Colored(FormatterMixin):
         return self.color("red", output)
 
 
-class Formatter(FormatterMixin):
+class DotsFormatter(FormatterMixin):
     def __init__(self, stream=sys.stderr):
         self.stream = stream
 

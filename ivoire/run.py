@@ -14,7 +14,7 @@ import ivoire
 
 
 FORMATTERS = {
-    "dots" : result.Formatter,
+    "dots" : result.DotsFormatter,
 }
 
 
