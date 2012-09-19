@@ -100,8 +100,13 @@ class TestTransform(TestCase, PatchMixin):
 class TestRun(TestCase, PatchMixin):
     def setUp(self):
         self.config = mock.Mock(specs=[])
+        self.setup = self.patchObject(run, "setup")
         self.exit = self.patchObject(run.sys, "exit")
         self.result = self.patchObject(ivoire, "current_result")
+
+    def test_it_sets_up_the_environment(self):
+        run.run(self.config)
+        self.setup.assert_called_once_with(self.config)
 
     def test_it_respects_fail_fast(self):
         self.config.exitfirst = True
@@ -126,11 +131,9 @@ class TestRun(TestCase, PatchMixin):
 class TestMain(TestCase, PatchMixin):
     def test_main(self):
         parse = self.patchObject(run, "parse")
-        setup = self.patchObject(run, "setup")
-
         argv = mock.Mock()
+
         run.main(argv)
 
         parse.assert_called_once_with(argv)
-        setup.assert_called_once_with(parse.return_value)
         parse.return_value.func.assert_called_once_with(parse.return_value)

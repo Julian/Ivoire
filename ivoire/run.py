@@ -26,7 +26,7 @@ def should_color(when):
 
 def parse(argv=None):
     """
-    Parse some arguments using the parser, cleaning up the resulting Namespace.
+    Parse some arguments using the parser.
 
     """
 
@@ -37,8 +37,13 @@ def parse(argv=None):
     if not argv or argv[0] not in {"run", "transform"}:
         argv.insert(0, "run")
 
-    arguments = _parser.parse_args(argv)
-    arguments.color = should_color(arguments.color)
+    arguments = _clean(_parser.parse_args(argv))
+    return arguments
+
+
+def _clean(arguments):
+    if hasattr(arguments, "color"):
+        arguments.color = should_color(arguments.color)
     return arguments
 
 
@@ -66,6 +71,8 @@ def run(config):
 
     """
 
+    setup(config)
+
     if config.exitfirst:
         ivoire.current_result.failfast = True
 
@@ -92,7 +99,6 @@ def transform(config):
 
 def main(argv=None):
     arguments = parse(argv)
-    setup(arguments)
     arguments.func(arguments)
 
 
@@ -135,18 +141,6 @@ _transform = _subparsers.add_parser(
     "transform",
     help="Run an Ivoire spec through another test runner by translating its "
          "source code.",
-)
-_transform.add_argument(
-    "-c", "--color",
-    choices=["always", "never", "auto"],
-    default="auto",
-    dest="color",
-    help="Format colored output.",
-)
-_transform.add_argument(
-    "-v", "--verbose",
-    action="store_true",
-    help="Format verbose output.",
 )
 _transform.add_argument(
     "runner",

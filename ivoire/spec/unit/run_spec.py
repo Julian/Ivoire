@@ -22,7 +22,9 @@ with describe(run.run) as it:
     @it.before
     def before(test):
         test.config = mock.Mock(specs=[])
+        test.load_by_name = patchObject(test, run, "load_by_name")
         test.result = patch(test, "ivoire.current_result")
+        test.setup = patchObject(test, run, "setup")
         test.exit = patchObject(test, run.sys, "exit")
 
     with it("succeeds with status code 0") as test:
