@@ -71,7 +71,7 @@ def setup(config):
 
     """
 
-    formatter = result.Formatter()
+    formatter = config.Formatter()
 
     if config.verbose:
         formatter = result.Verbose(formatter)

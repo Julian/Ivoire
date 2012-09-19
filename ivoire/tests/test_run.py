@@ -63,6 +63,13 @@ class TestSetup(TestCase, PatchMixin):
         run.setup(self.config)
         self.assertIsNotNone(ivoire.current_result)
 
+    def test_plain(self):
+        self.config.color = False
+        run.setup(self.config)
+        self.assertEqual(
+            ivoire.current_result.formatter, self.config.Formatter.return_value
+        )
+
     def test_verbose(self):
         self.config.verbose = True
         run.setup(self.config)
@@ -72,13 +79,6 @@ class TestSetup(TestCase, PatchMixin):
         self.config.color = True
         run.setup(self.config)
         self.assertIsInstance(ivoire.current_result.formatter, result.Colored)
-
-    def test_plain(self):
-        self.config.color = False
-        run.setup(self.config)
-        self.assertIsInstance(
-            ivoire.current_result.formatter, result.Formatter
-        )
 
 
 class TestTransform(TestCase, PatchMixin):
