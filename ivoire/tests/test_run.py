@@ -85,18 +85,31 @@ class TestTransform(TestCase, PatchMixin):
     def setUp(self):
         self.ExampleLoader = self.patchObject(run, "ExampleLoader")
         self.patchObject(run, "transform_possible", True)
-        self.config = mock.Mock(runner="runner", specs=["a/spec.py"])
+        self.config = mock.Mock(runner="runner", specs=["a/spec.py"], args=[])
         self.run_path = self.patchObject(run.runpy, "run_path")
 
-    def test_sets_up_path_hook(self):
+    def test_it_sets_up_path_hook(self):
         run.transform(self.config)
         self.ExampleLoader.register.assert_called_once_with()
 
-    def test_runs_the_script(self):
+    def test_it_runs_the_script(self):
         run.transform(self.config)
         self.run_path.assert_called_once_with(
             self.config.runner, run_name="__main__",
         )
+
+    def test_it_cleans_and_resets_sys_argv(self):
+        self.config.args = ["foo", "bar", "baz"]
+        argv = self.patchObject(run.sys, "argv", ["spam", "eggs"])
+
+        # argv was set immediately before run_path
+        self.run_path.side_effect = lambda *a, **k : (
+            self.assertEqual(argv[1:], self.config.args)
+        )
+        run.transform(self.config)
+
+        # ... and was restored afterwards
+        self.assertEqual(argv[1:], ["eggs"])
 
 
 class TestRun(TestCase, PatchMixin):
