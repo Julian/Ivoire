@@ -17,30 +17,6 @@ from ivoire.standalone import Example, ExampleGroup, describe
 from ivoire.tests.util import PatchMixin, mock
 
 
-class TestDescribe(TestCase, PatchMixin):
-    def test_describe(self):
-        self.assertEqual(describe, ExampleGroup)
-
-    def test_it_can_have_Example_specified(self):
-        self.patchObject(ivoire, "current_result")
-        OtherExample = mock.Mock()
-
-        it = ExampleGroup(describe, Example=OtherExample)
-        self.assertEqual(it.Example, OtherExample)
-
-    def test_it_passes_failure_exceptions_along(self):
-        self.patchObject(ivoire, "current_result")
-        it = ExampleGroup(describe)
-        it.failureException = IndexError
-        self.assertEqual(it("set it").failureException, IndexError)
-
-    def test_it_does_not_pass_along_failureException_when_none_was_set(self):
-        self.patchObject(ivoire, "current_result")
-        it = ExampleGroup(describe)
-        self.assertIsNone(it.failureException)
-        self.assertIsNotNone(it("didn't set it").failureException)
-
-
 class TestDescribeTests(TestCase, PatchMixin):
     def setUp(self):
         self.result = self.patchObject(
@@ -48,18 +24,6 @@ class TestDescribeTests(TestCase, PatchMixin):
         )
         self.describes = ExampleGroup
         self.it = ExampleGroup(self.describes)
-
-    def test_str(self):
-        self.assertEqual(str(self.it), self.it.describes.__name__)
-
-    def test_repr(self):
-        self.assertEqual(
-            repr(self.it),
-            "<{0.__class__.__name__} examples={0.examples}>".format(self.it)
-        )
-
-    def test_it_sets_the_described_object(self):
-        self.assertEqual(self.it.describes, self.describes)
 
     def test_it_adds_an_example(self):
         with self.it as it:
