@@ -117,7 +117,7 @@ def transform(config):
 
     if transform_possible:
         ExampleLoader.register()
-        return runpy.run_path(config.runner)
+        return runpy.run_path(config.runner, run_name="__main__")
 
 
 def main(argv=None):

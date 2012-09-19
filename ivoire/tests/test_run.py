@@ -94,7 +94,9 @@ class TestTransform(TestCase, PatchMixin):
 
     def test_runs_the_script(self):
         run.transform(self.config)
-        self.run_path.assert_called_once_with(self.config.runner)
+        self.run_path.assert_called_once_with(
+            self.config.runner, run_name="__main__",
+        )
 
 
 class TestRun(TestCase, PatchMixin):
