@@ -2,6 +2,9 @@
 Ivoire
 ======
 
+.. image:: https://secure.travis-ci.org/Julian/Ivoire.png
+    :alt: Travis CI Build Status
+
 ``ivoire`` is an `RSpec <http://rspec.info/>`_-like testing framework for
 Python. It aims to bring a few minor constructs over to Python in a way that
 isn't overwhelmingly disruptive or counterculture.
