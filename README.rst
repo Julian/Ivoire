@@ -45,22 +45,22 @@ Here's an example of what a specification looks like.
 
 
     with describe(Calculator) as it:
+        @it.before
+        def before(test):
+            test.calc = Calculator()
+
         with it("adds two numbers") as test:
-            calculator = Calculator()
-            test.assertEqual(calculator.add(2, 4), 6)
+            test.assertEqual(test.calc.add(2, 4), 6)
 
         with it("divides two numbers") as test:
-            calculator = Calculator()
-            test.assertEqual(calculator.divide(8, 4), 2)
+            test.assertEqual(test.calc.divide(8, 4), 2)
 
         with it("doesn't divide by zero") as test:
-            calculator = Calculator()
             with test.assertRaises(ZeroDivisionError):
-                calculator.divide(8, 0)
+                test.calc.divide(8, 0)
 
         with it("multiplies two numbers") as test:
-            calculator = Calculator()
-            test.assertEqual(calculator.multiply(2, 3), 6)
+            test.assertEqual(test.calc.multiply(2, 3), 6)
 
 
 You can find this example at ``examples/calculator_spec.py``, alongside a few
