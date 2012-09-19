@@ -12,16 +12,13 @@ from __future__ import unicode_literals
 from unittest import TestCase
 import sys
 
-import ivoire
 from ivoire.standalone import describe
 from ivoire.tests.util import PatchMixin, mock
 
 
 class TestDescribeTests(TestCase, PatchMixin):
     def setUp(self):
-        self.result = self.patchObject(
-            ivoire, "current_result", shouldStop=False
-        )
+        self.result = self.patch("ivoire.current_result", shouldStop=False)
         self.describes = describe
         self.it = describe(self.describes)
 
