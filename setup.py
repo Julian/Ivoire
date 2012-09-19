@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 import os.path
 
 from ivoire import __version__
@@ -30,7 +30,7 @@ setup(
     name="ivoire",
     version=__version__,
     entry_points={"console_scripts" : ["ivoire = ivoire.run:main"]},
-    packages=["ivoire", "ivoire.tests"],
+    packages=find_packages(),
     author="Julian Berman",
     author_email="Julian@GrayVines.com",
     classifiers=classifiers,
