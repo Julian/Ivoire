@@ -37,6 +37,11 @@ class Example(TestCase):
         self.__name = name
 
     def __enter__(self):
+        """
+        Run the example.
+
+        """
+
         self.__result.startTest(self)
 
         if self.__before is not None:
@@ -50,6 +55,10 @@ class Example(TestCase):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """
+        Finish running the example, logging any raised exceptions as results.
+
+        """
         if exc_type is None:
             self.__result.addSuccess(self)
         elif exc_type == KeyboardInterrupt:
@@ -85,6 +94,11 @@ class Example(TestCase):
         return self.__group
 
     def skip_if(self, condition, reason):
+        """
+        Skip the example if the condition is set, with the provided reason.
+
+        """
+
         if condition:
             raise SkipTest(reason)
 
@@ -104,6 +118,11 @@ class ExampleGroup(object):
         self.examples = []
 
     def __enter__(self):
+        """
+        Begin running the group.
+
+        """
+
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
