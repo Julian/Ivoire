@@ -1,7 +1,6 @@
-from ivoire import describe
-
-from ivoire import result, run
+from ivoire import describe, result, run
 from ivoire.spec.util import mock, patch, patchObject
+import ivoire
 
 
 with describe(run.parse) as it:
@@ -61,6 +60,34 @@ with describe(run.should_color) as it:
     with it("doesn't color otherwise") as test:
         test.stderr.isatty.return_value = False
         test.assertFalse(run.should_color("auto"))
+
+
+with describe(run.setup) as it:
+    @it.before
+    def before(test):
+        patchObject(test, ivoire, "current_result", None)
+        test.config = mock.Mock(verbose=False, color=False)
+
+    with it("sets a result") as test:
+        test.assertIsNone(ivoire.current_result)
+        run.setup(test.config)
+        test.assertIsNotNone(ivoire.current_result)
+
+    with it("makes a plain Formatter if color and verbose are False") as test:
+        run.setup(test.config)
+        test.assertEqual(
+            ivoire.current_result.formatter, test.config.Formatter.return_value
+        )
+
+    with it("makes a verbose Formatter if verbose is True") as test:
+        test.config.verbose = True
+        run.setup(test.config)
+        test.assertIsInstance(ivoire.current_result.formatter, result.Verbose)
+
+    with it("makes a colored Formatter if color is True") as test:
+        test.config.color = True
+        run.setup(test.config)
+        test.assertIsInstance(ivoire.current_result.formatter, result.Colored)
 
 
 with describe(run.run) as it:
@@ -125,3 +152,35 @@ with describe(run.main) as it:
 
         parse.assert_called_once_with(argv)
         parse.return_value.func.assert_called_once_with(parse.return_value)
+
+
+with describe(run.transform) as it:
+    @it.before
+    def before(test):
+        patchObject(test, run, "transform_possible", True)
+        test.ExampleLoader = patchObject(test, run, "ExampleLoader")
+        test.config = mock.Mock(runner="runner", specs=["a/spec.py"], args=[])
+        test.run_path = patchObject(test, run.runpy, "run_path")
+
+    with it("sets up the path hook") as test:
+        run.transform(test.config)
+        test.ExampleLoader.register.assert_called_once_with()
+
+    with it("runs the script") as test:
+        run.transform(test.config)
+        test.run_path.assert_called_once_with(
+            test.config.runner, run_name="__main__",
+        )
+
+    with it("cleans and resets sys.argv") as test:
+        test.config.args = ["foo", "bar", "baz"]
+        argv = patchObject(test, run.sys, "argv", ["spam", "eggs"])
+
+        # argv was set immediately before run_path
+        test.run_path.side_effect = lambda *a, **k : (
+            test.assertEqual(argv[1:], test.config.args)
+        )
+        run.transform(test.config)
+
+        # ... and was restored afterwards
+        test.assertEqual(argv[1:], ["eggs"])
