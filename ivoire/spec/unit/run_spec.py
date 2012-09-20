@@ -1,7 +1,52 @@
 from ivoire import describe
 
-from ivoire import run
+from ivoire import result, run
 from ivoire.spec.util import mock, patch, patchObject
+
+
+with describe(run.parse) as it:
+    @it.before
+    def before(test):
+        test.specs = ["a_spec"]
+
+    with it("sets reasonable defaults") as test:
+        should_color = patchObject(test, run, "should_color")
+        arguments = run.parse(test.specs)
+        test.assertEqual(vars(arguments), {
+            "Formatter" : result.DotsFormatter,
+            "color" : should_color.return_value,
+            "exitfirst" : False,
+            "specs" : test.specs,
+            "func" : run.run,
+            "verbose" : False,
+        })
+        should_color.assert_called_once_with("auto")
+
+    with it("can exitfirst") as test:
+        arguments = run.parse(["--exitfirst"] + test.specs)
+        test.assertTrue(arguments.exitfirst)
+
+        arguments = run.parse(["-x"] + test.specs)
+        test.assertTrue(arguments.exitfirst)
+
+    with it("can be verbose") as test:
+        arguments = run.parse(["--verbose"] + test.specs)
+        test.assertTrue(arguments.verbose)
+
+        arguments = run.parse(["-v"] + test.specs)
+        test.assertTrue(arguments.verbose)
+
+    with it("can transform") as test:
+        arguments = run.parse(["transform", "foo", "bar"])
+        test.assertEqual(vars(arguments), {
+            "runner" : "foo",
+            "args" : ["bar"],
+            "func" : run.transform,
+        })
+
+    with it("runs run on empty args") as test:
+        arguments = run.parse()
+        test.assertEqual(arguments.func, run.run)
 
 
 with describe(run.should_color) as it:

@@ -53,7 +53,7 @@ def parse(argv=None):
 
     # Evade http://bugs.python.org/issue9253
     if not argv or argv[0] not in {"run", "transform"}:
-        argv.insert(0, "run")
+        argv = ["run"] + argv
 
     arguments = _clean(_parser.parse_args(argv))
     return arguments

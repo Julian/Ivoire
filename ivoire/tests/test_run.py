@@ -5,55 +5,6 @@ from ivoire import result, run
 from ivoire.tests.util import PatchMixin, mock
 
 
-class TestParser(TestCase, PatchMixin):
-    def test_dots_by_default(self):
-        should_color = self.patchObject(run, "should_color")
-        arguments = run.parse(["foo"])
-        self.assertEqual(arguments.Formatter, result.DotsFormatter)
-
-    def test_not_verbose_by_default(self):
-        arguments = run.parse(["foo"])
-        self.assertFalse(arguments.verbose)
-
-    def test_colored_auto_by_default(self):
-        should_color = self.patchObject(run, "should_color")
-        arguments = run.parse(["foo"])
-        should_color.assert_called_once_with("auto")
-
-    def test_color(self):
-        should_color = self.patchObject(run, "should_color")
-        arguments = run.parse(["--color=auto", "foo"])
-        self.assertEqual(arguments.color, should_color.return_value)
-        should_color.assert_called_once_with("auto")
-
-    def test_not_exitfirst_by_default(self):
-        arguments = run.parse(["foo"])
-        self.assertFalse(arguments.exitfirst)
-
-    def test_exitfirst(self):
-        arguments = run.parse(["--exitfirst", "foo"])
-        self.assertTrue(arguments.exitfirst)
-
-    def test_no_transform(self):
-        arguments = run.parse(["foo", "bar"])
-        self.assertEqual(arguments.func, run.run)
-        self.assertEqual(arguments.specs, ["foo", "bar"])
-
-    def test_transform(self):
-        arguments = run.parse(["transform", "foo", "bar"])
-        self.assertEqual(arguments.func, run.transform)
-        self.assertEqual(arguments.runner, "foo")
-        self.assertEqual(arguments.args, ["bar"])
-
-    def test_does_not_break_on_empty_args(self):
-        # Didn't think of the proper way to test this yet so this test will
-        # ultimately probably break
-        argv = self.patchObject(run.sys, "argv", ["ivoire"])  #  sowwy
-        parse_args = self.patchObject(run._parser, "parse_args")  #  sowwy
-        run.parse()
-        parse_args.assert_called_once_with(["run"])
-
-
 class TestSetup(TestCase, PatchMixin):
     def setUp(self):
         self.patchObject(ivoire, "current_result", None)
