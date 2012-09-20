@@ -28,20 +28,6 @@ class TestDescribeTests(TestCase, PatchMixin):
                 pass
         self.assertEqual(it.examples, [test])
 
-    def test_iterating_yields_examples(self):
-        with self.it as it:
-            with it("does a thing") as test:
-                pass
-        self.assertEqual(list(it), it.examples)
-
-    def test_counts_its_examples(self):
-        with self.it as it:
-            pass
-
-        self.assertEqual(it.countTestCases(), 0)
-        it.add_example(mock.Mock(**{"countTestCases.return_value" : 3}))
-        self.assertEqual(it.countTestCases(), 3)
-
     def test_it_can_pass(self):
         with self.it as it:
             with it("does a thing") as test:

@@ -48,3 +48,14 @@ with describe(describe) as it:
     with it("leaves the default failureException alone") as test:
         test.assertIsNone(test.it.failureException)
         test.assertIsNotNone(test.it("Example").failureException)
+
+    with it("yields examples when iterating") as test:
+        example, another = mock.Mock(), mock.Mock()
+        test.it.add_example(example)
+        test.it.add_example(another)
+        test.assertEqual(list(test.it), test.it.examples)
+
+    with it("counts its examples") as test:
+        test.assertEqual(test.it.countTestCases(), 0)
+        test.it.add_example(mock.Mock(**{"countTestCases.return_value" : 3}))
+        test.assertEqual(test.it.countTestCases(), 3)
