@@ -7,19 +7,6 @@ from ivoire import transform
 from ivoire.tests.util import PatchMixin, mock
 
 
-class TestLoad(TestCase, PatchMixin):
-    def test_load_module_is_exposed_globally(self):
-        ExampleLoader = self.patchObject(transform, "ExampleLoader")
-        path = "dummy/path"
-
-        module = transform.load_spec(path)
-
-        ExampleLoader.assert_called_once_with(path)
-        self.assertEqual(
-            module, ExampleLoader.return_value.load_module.return_value,
-        )
-
-
 class TestRegistration(TestCase, PatchMixin):
     def setUp(self):
         self.FileFinder = self.patchObject(transform, "FileFinder")

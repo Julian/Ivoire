@@ -184,14 +184,3 @@ class ExampleLoader(SourceFileLoader):
         node = ast.parse(source_bytes)
         transformed = ExampleTransformer().transform(node)
         return compile(transformed, source_path, "exec", dont_inherit=True)
-
-
-def load_spec(path):
-    """
-    Load a spec from the given path.
-
-    Returns the resulting transformed module.
-
-    """
-
-    return ExampleLoader(path).load_module(path)
