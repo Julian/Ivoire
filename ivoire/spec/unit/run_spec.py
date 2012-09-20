@@ -68,9 +68,32 @@ with describe(run.run) as it:
     def before(test):
         test.config = mock.Mock(specs=[])
         test.load_by_name = patchObject(test, run, "load_by_name")
-        test.result = patch(test, "ivoire.current_result")
+        test.result = patch(test, "ivoire.current_result", failfast=False)
         test.setup = patchObject(test, run, "setup")
         test.exit = patchObject(test, run.sys, "exit")
+
+    with it("sets up the environment") as test:
+        run.run(test.config)
+        test.setup.assert_called_once_with(test.config)
+
+    with it("sets failfast on the result") as test:
+        test.assertFalse(test.result.failfast)
+        test.config.exitfirst = True
+        run.run(test.config)
+        test.assertTrue(test.result.failfast)
+
+    with it("starts and stops a test run") as test:
+        run.run(test.config)
+        test.result.startTestRun.assert_called_once_with()
+        test.result.stopTestRun.assert_called_once_with()
+
+    with it("loads specs") as test:
+        test.config.specs = [mock.Mock(), mock.Mock(), mock.Mock()]
+        run.run(test.config)
+        test.assertEqual(
+            test.load_by_name.mock_calls,
+            [mock.call(spec) for spec in test.config.specs],
+        )
 
     with it("succeeds with status code 0") as test:
         test.result.wasSuccessful.return_value = True
@@ -91,3 +114,14 @@ with describe(run.run) as it:
         (example, traceback), _ = test.result.addError.call_args
         test.assertEqual(str(example), "<not in example>")
         test.assertEqual(traceback[0], IndexError)
+
+
+with describe(run.main) as it:
+    with it("runs the correct func with parsed args") as test:
+        parse = patchObject(test, run, "parse")
+        argv = mock.Mock()
+
+        run.main(argv)
+
+        parse.assert_called_once_with(argv)
+        parse.return_value.func.assert_called_once_with(parse.return_value)
