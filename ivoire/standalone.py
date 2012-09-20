@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from unittest import TestCase, TestResult
+from unittest import SkipTest, TestCase, TestResult
 import sys
 
 import ivoire
@@ -54,6 +54,8 @@ class Example(TestCase):
             self.__result.addSuccess(self)
         elif exc_type == KeyboardInterrupt:
             return False
+        elif exc_type == SkipTest:
+            self.__result.addSkip(self, str(exc_value))
         elif exc_type == self.failureException:
             self.__result.addFailure(self, (exc_type, exc_value, traceback))
         else:
@@ -81,6 +83,10 @@ class Example(TestCase):
     @property
     def group(self):
         return self.__group
+
+    def skip_if(self, condition, reason):
+        if condition:
+            raise SkipTest(reason)
 
 
 class ExampleGroup(object):

@@ -132,3 +132,16 @@ class TestDescribeTests(TestCase, PatchMixin):
             with it("does a thing") as test:
                 self.result.shouldStop = True
             self.fail("should have stopped already!")  # pragma: no cover
+
+    def test_it_can_skip(self):
+        with self.it as it:
+            with it("should skip this test") as test:
+                test.skip_if(False, reason="A bad one")
+                test.skip_if(True, reason="A good one")
+                test.fail("Should have skipped!")
+
+        self.assertEqual(self.result.method_calls, [
+            mock.call.startTest(test),
+            mock.call.addSkip(test, "A good one"),
+            mock.call.stopTest(test),
+        ])
