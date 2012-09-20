@@ -11,16 +11,6 @@ from ivoire.standalone import ExampleGroup, describe
 from ivoire.spec.util import mock, patch, patchObject
 
 
-with describe(ExampleGroup) as it:
-    with it("is aliased to describe") as test:
-        test.assertEqual(describe, ExampleGroup)
-
-    with it("can have Example specified") as test:
-        OtherExample = mock.Mock()
-        group = ExampleGroup(ExampleGroup, Example=OtherExample)
-        test.assertEqual(group.Example, OtherExample)
-
-
 with describe(describe) as it:
     @it.before
     def before(test):
@@ -59,3 +49,13 @@ with describe(describe) as it:
         test.assertEqual(test.it.countTestCases(), 0)
         test.it.add_example(mock.Mock(**{"countTestCases.return_value" : 3}))
         test.assertEqual(test.it.countTestCases(), 3)
+
+    with it("can have Example specified") as test:
+        OtherExample = mock.Mock()
+        group = describe(ExampleGroup, Example=OtherExample)
+        test.assertEqual(group.Example, OtherExample)
+
+
+with describe(ExampleGroup) as it:
+    with it("is aliased to describe") as test:
+        test.assertEqual(describe, ExampleGroup)
