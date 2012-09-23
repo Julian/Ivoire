@@ -11,7 +11,7 @@ Globals defined in this module:
 
 """
 
-from ivoire.standalone import describe
+from ivoire.standalone import Example, describe
 
 
 __version__ = "0.1dev"

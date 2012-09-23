@@ -1,15 +1,15 @@
 from ivoire import describe, result, run
-from ivoire.spec.util import mock, patch, patchObject
+from ivoire.spec.util import ExampleWithPatch, mock
 import ivoire
 
 
-with describe(run.parse) as it:
+with describe(run.parse, Example=ExampleWithPatch) as it:
     @it.before
     def before(test):
         test.specs = ["a_spec"]
 
     with it("sets reasonable defaults") as test:
-        should_color = patchObject(test, run, "should_color")
+        should_color = test.patchObject(run, "should_color")
         arguments = run.parse(test.specs)
         test.assertEqual(vars(arguments), {
             "Formatter" : result.DotsFormatter,
@@ -48,10 +48,10 @@ with describe(run.parse) as it:
         test.assertEqual(arguments.func, run.run)
 
 
-with describe(run.should_color) as it:
+with describe(run.should_color, Example=ExampleWithPatch) as it:
     @it.before
     def before(test):
-        test.stderr = patchObject(test, run.sys, "stderr")
+        test.stderr = test.patchObject(run.sys, "stderr")
 
     with it("colors whenever stderr is a tty") as test:
         test.stderr.isatty.return_value = True
@@ -62,10 +62,10 @@ with describe(run.should_color) as it:
         test.assertFalse(run.should_color("auto"))
 
 
-with describe(run.setup) as it:
+with describe(run.setup, Example=ExampleWithPatch) as it:
     @it.before
     def before(test):
-        patchObject(test, ivoire, "current_result", None)
+        test.patchObject(ivoire, "current_result", None)
         test.config = mock.Mock(verbose=False, color=False)
 
     with it("sets a result") as test:
@@ -90,14 +90,14 @@ with describe(run.setup) as it:
         test.assertIsInstance(ivoire.current_result.formatter, result.Colored)
 
 
-with describe(run.run) as it:
+with describe(run.run, Example=ExampleWithPatch) as it:
     @it.before
     def before(test):
         test.config = mock.Mock(specs=[])
-        test.load_by_name = patchObject(test, run, "load_by_name")
-        test.result = patch(test, "ivoire.current_result", failfast=False)
-        test.setup = patchObject(test, run, "setup")
-        test.exit = patchObject(test, run.sys, "exit")
+        test.load_by_name = test.patchObject(run, "load_by_name")
+        test.result = test.patch("ivoire.current_result", failfast=False)
+        test.setup = test.patchObject(run, "setup")
+        test.exit = test.patchObject(run.sys, "exit")
 
     with it("sets up the environment") as test:
         run.run(test.config)
@@ -143,9 +143,9 @@ with describe(run.run) as it:
         test.assertEqual(traceback[0], IndexError)
 
 
-with describe(run.main) as it:
+with describe(run.main, Example=ExampleWithPatch) as it:
     with it("runs the correct func with parsed args") as test:
-        parse = patchObject(test, run, "parse")
+        parse = test.patchObject(run, "parse")
         argv = mock.Mock()
 
         run.main(argv)
@@ -154,13 +154,13 @@ with describe(run.main) as it:
         parse.return_value.func.assert_called_once_with(parse.return_value)
 
 
-with describe(run.transform) as it:
+with describe(run.transform, Example=ExampleWithPatch) as it:
     @it.before
     def before(test):
-        patchObject(test, run, "transform_possible", True)
-        test.ExampleLoader = patchObject(test, run, "ExampleLoader")
+        test.patchObject(run, "transform_possible", True)
+        test.ExampleLoader = test.patchObject(run, "ExampleLoader")
         test.config = mock.Mock(runner="runner", specs=["a/spec.py"], args=[])
-        test.run_path = patchObject(test, run.runpy, "run_path")
+        test.run_path = test.patchObject(run.runpy, "run_path")
 
     with it("sets up the path hook") as test:
         run.transform(test.config)
@@ -174,7 +174,7 @@ with describe(run.transform) as it:
 
     with it("cleans and resets sys.argv") as test:
         test.config.args = ["foo", "bar", "baz"]
-        argv = patchObject(test, run.sys, "argv", ["spam", "eggs"])
+        argv = test.patchObject(run.sys, "argv", ["spam", "eggs"])
 
         # argv was set immediately before run_path
         test.run_path.side_effect = lambda *a, **k : (

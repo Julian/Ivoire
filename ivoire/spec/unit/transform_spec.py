@@ -5,7 +5,7 @@ import ast
 import copy
 
 from ivoire import describe, transform
-from ivoire.spec.util import mock, patch, patchObject
+from ivoire.spec.util import ExampleWithPatch, mock
 
 
 def dump(node):  # pragma: no cover
@@ -18,7 +18,7 @@ def dump(node):  # pragma: no cover
     """.format(ast.dump(node))))
 
 
-with describe(transform.ExampleTransformer) as it:
+with describe(transform.ExampleTransformer, Example=ExampleWithPatch) as it:
     @it.before
     def before(test):
         test.transformer = transform.ExampleTransformer()
@@ -42,7 +42,7 @@ with describe(transform.ExampleTransformer) as it:
         test.assertEqual(ast.dump(node), ast.dump(transformed))
 
     with it("fixes missing line numbers") as test:
-        fix = patchObject(test, transform.ast, "fix_missing_locations")
+        fix = test.patchObject(transform.ast, "fix_missing_locations")
         node = ast.Pass()
         test.transformer.transform(node)
         fix.assert_called_once_with(node)

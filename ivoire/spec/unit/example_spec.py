@@ -1,10 +1,10 @@
 from ivoire.standalone import Example, describe
 import ivoire
 
-from ivoire.spec.util import mock, patch, patchObject
+from ivoire.spec.util import ExampleWithPatch, mock
 
 
-with describe(Example) as it:
+with describe(Example, Example=ExampleWithPatch) as it:
     @it.before
     def before(test):
         test.name = "the name of the Example"
@@ -39,6 +39,6 @@ with describe(Example) as it:
         test.assertNotEqual(hash(test.example), hash(another))
 
     with it("raises a ValueError if the global result is not set") as test:
-        patchObject(test, ivoire, "current_result", None)
+        test.patchObject(ivoire, "current_result", None)
         with test.assertRaises(ValueError):
             Example(test.name, test.example_group)

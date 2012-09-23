@@ -8,10 +8,10 @@ The rest of the specification is written as a pyUnit test case (in the
 
 from ivoire.standalone import ExampleGroup, describe
 
-from ivoire.spec.util import mock, patch, patchObject
+from ivoire.spec.util import ExampleWithPatch, mock
 
 
-with describe(describe) as it:
+with describe(describe, Example=ExampleWithPatch) as it:
     @it.before
     def before(test):
         test.describes = mock.Mock(__name__="DescribedThing")
@@ -56,6 +56,6 @@ with describe(describe) as it:
         test.assertEqual(group.Example, OtherExample)
 
 
-with describe(ExampleGroup) as it:
+with describe(ExampleGroup, Example=ExampleWithPatch) as it:
     with it("is aliased to describe") as test:
         test.assertEqual(describe, ExampleGroup)
