@@ -32,6 +32,10 @@ class ExampleResult(TestResult):
         super(ExampleResult, self).addSuccess(example)
         self.formatter.show(self.formatter.success(example))
 
+    def addSkip(self, example, reason):
+        super(ExampleResult, self).addSkip(example, reason)
+        self.formatter.show(self.formatter.skip(example, reason))
+
     def stopTestRun(self):
         super(ExampleResult, self).stopTestRun()
         self.elapsed = time.time() - self._start
@@ -188,6 +192,14 @@ class DotsFormatter(FormatterMixin):
         """
 
         return "F"
+
+    def skip(self, example, reason):
+        """
+        A skip was encountered.
+
+        """
+
+        return "S"
 
     def success(self, example):
         """
