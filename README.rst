@@ -80,11 +80,12 @@ After installing Ivoire, running the example above with
 Running the Test Suite
 ----------------------
 
-You can run Ivoire's test suite by running ``tox`` in the root of the
-repository checkout, or by running ``YourFavoriteTestRunner ivoire``.
+Ivoire's test suite is currently written mostly in itself, but it still has a
+small section that is written using the standard ``unittest`` test cases.
 
-You need to have ``tox`` installed via your package manager or with
-``pip install tox`` for the former.
+You can run Ivoire's test suite by running ``tox`` in the root of the
+repository checkout after installing ``tox`` via your package manager or with
+``pip install tox``. This will run both parts of the suite.
 
 
 Contributing
