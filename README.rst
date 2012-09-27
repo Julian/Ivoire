@@ -28,9 +28,8 @@ the `issue tracker <https://github.com/Julian/Ivoire/issues>`_.
 A Small Example
 ---------------
 
-``ivoire`` has two modes of operation: standalone mode and transform mode. In
-standalone mode, you simply write some tests using ``ivoire.describe`` and then
-execute them with the included ``ivoire`` test runner.
+To write specs using Ivoire, simply import and use ``ivoire.describe``. You can
+then execute the spec using the included ``ivoire`` test runner.
 
 Here's an example of what a specification looks like.
 
@@ -75,6 +74,14 @@ After installing Ivoire, running the example above with
 .. image:: https://github.com/Julian/Ivoire/raw/master/examples/img/calculator_spec_output.png
     :alt: spec output
     :align: center
+
+If you'd like a more verbose output, try passing the ``-v`` command line flag.
+
+At some point in the (hopefully very near) future, when I've sorted out an
+import hook, Ivoire will also be able to be run as
+``ivoire transform `which nosetests` --testmatch='(?:^|[\b_\./-])[Ss]pec'``,
+which will transform specs automatically into normal ``unittest.TestCase``\s.
+Work on this is in progress.
 
 
 Running the Test Suite
