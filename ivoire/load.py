@@ -51,5 +51,3 @@ def discover(path, filter_specs=filter_specs):
     for dirpath, _, filenames in os.walk(path):
         for spec in filter_specs(filenames):
             yield os.path.join(dirpath, spec)
-
-
