@@ -43,7 +43,7 @@ with describe(describe, Example=ExampleWithPatch) as it:
         example, another = mock.Mock(), mock.Mock()
         test.it.add_example(example)
         test.it.add_example(another)
-        test.assertEqual(list(test.it), test.it.examples)
+        test.assertEqual(list(test.it), [example, another])
 
     with it("counts its examples") as test:
         test.assertEqual(test.it.countTestCases(), 0)
