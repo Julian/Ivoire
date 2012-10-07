@@ -41,7 +41,6 @@ class TestDescribeTests(TestCase, PatchMixin):
             mock.call.exitGroup(self.it),
         ])
 
-
     def test_it_can_fail(self):
         with self.it as it:
             with it("does a thing") as test:
@@ -155,3 +154,23 @@ class TestDescribeTests(TestCase, PatchMixin):
             mock.call.stopTest(test),
             mock.call.exitGroup(self.it),
         ])
+
+    def test_it_only_calls_enterGroup_if_result_knows_how(self):
+        del self.result.enterGroup
+
+        with self.it as it:
+            pass
+
+        self.assertEqual(
+            self.result.method_calls, [mock.call.exitGroup(self.it)],
+        )
+
+    def test_it_only_calls_exitGroup_if_result_knows_how(self):
+        del self.result.exitGroup
+
+        with self.it as it:
+            pass
+
+        self.assertEqual(
+            self.result.method_calls, [mock.call.enterGroup(self.it)],
+        )

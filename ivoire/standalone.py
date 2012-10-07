@@ -117,11 +117,18 @@ class ExampleGroup(object):
         """
 
         self.result = self._get_result()
-        self.result.enterGroup(self)
+
+        enterGroup = getattr(self.result, "enterGroup", None)
+        if enterGroup is not None:
+            enterGroup(self)
+
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.result.exitGroup(self)
+        exitGroup = getattr(self.result, "exitGroup", None)
+        if exitGroup is not None:
+            exitGroup(self)
+
         if exc_type == _ShouldStop:
             return True
 
