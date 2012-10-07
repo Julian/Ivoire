@@ -25,6 +25,16 @@ with describe(result.ExampleResult, Example=ExampleWithPatch) as it:
     def assertShown(test, output):
         test.formatter.show.assert_called_with(output)
 
+    with it("enters groups") as test:
+        test.result.enterGroup(test.test.group)
+        test.formatter.enter_group.assert_called_once_with(test.test.group)
+        assertShown(test, test.formatter.enter_group.return_value)
+
+    with it("exits groups") as test:
+        test.result.exitGroup(test.test.group)
+        test.formatter.exit_group.assert_called_once_with(test.test.group)
+        assertShown(test, test.formatter.exit_group.return_value)
+
     with it("shows successes") as test:
         test.result.addSuccess(test.test)
         test.formatter.success.assert_called_once_with(test.test)
@@ -89,46 +99,28 @@ with describe(result.Verbose, Example=ExampleWithPatch) as it:
         test.verbose.finished()
         test.formatter.show.assert_called_once_with("\n")
 
+    with it("shows group names when entered") as test:
+        test.assertEqual(
+            test.verbose.enter_group(test.test.group),
+            "{}\n".format(test.test.group)
+        )
+
     with it("formats successes") as test:
-        test.verbose.maybe_show_group = mock.Mock()
         test.assertEqual(
             test.verbose.success(test.test), "    {}\n".format(test.test)
         )
-        test.verbose.maybe_show_group.assert_called_once_with(test.test.group)
 
     with it("formats errors") as test:
-        test.verbose.maybe_show_group = mock.Mock()
         test.assertEqual(
             test.verbose.error(test.test, test.exc_info),
             "    {} - ERROR\n".format(test.test)
         )
-        test.verbose.maybe_show_group.assert_called_once_with(test.test.group)
 
     with it("formats failures") as test:
-        test.verbose.maybe_show_group = mock.Mock()
         test.assertEqual(
             test.verbose.failure(test.test, test.exc_info),
             "    {} - FAIL\n".format(test.test)
         )
-        test.verbose.maybe_show_group.assert_called_once_with(test.test.group)
-
-
-with describe(result.Verbose.maybe_show_group, Example=ExampleWithPatch) as it:
-    @it.before
-    def before(test):
-        test.formatter = mock.Mock()
-        test.test = mock.Mock()
-        test.verbose = result.Verbose(test.formatter)
-
-    with it("shows newly seen groups") as test:
-        test.verbose.maybe_show_group(test.test.group)
-        test.verbose.show.assert_called_once_with(str(test.test.group) + "\n")
-
-    with it("doesn't show old groups") as test:
-        test.verbose.maybe_show_group(test.test.group)
-
-        test.verbose.maybe_show_group(test.test.group)
-        test.assertEqual(test.verbose.show.call_count, 1)
 
 
 with describe(result.DotsFormatter, Example=ExampleWithPatch) as it:
@@ -141,6 +133,12 @@ with describe(result.DotsFormatter, Example=ExampleWithPatch) as it:
 
         test.stream = mock.Mock()
         test.formatter = result.DotsFormatter(test.stream)
+
+    with it("does not format anything for entering a group") as test:
+        test.assertFalse(test.formatter.enter_group(test.test.group))
+
+    with it("does not format anything for exiting a group") as test:
+        test.assertFalse(test.formatter.exit_group(test.test.group))
 
     with it("formats . for successes") as test:
         test.assertEqual(test.formatter.success(test.test), ".")

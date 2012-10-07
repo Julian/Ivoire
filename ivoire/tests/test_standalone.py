@@ -34,9 +34,11 @@ class TestDescribeTests(TestCase, PatchMixin):
                 pass
 
         self.result.assert_has_calls([
+            mock.call.enterGroup(self.it),
             mock.call.startTest(test),
             mock.call.addSuccess(test),
             mock.call.stopTest(test),
+            mock.call.exitGroup(self.it),
         ])
 
 
@@ -50,9 +52,11 @@ class TestDescribeTests(TestCase, PatchMixin):
                     raise
 
         self.result.assert_has_calls([
-                mock.call.startTest(test),
-                mock.call.addFailure(test, exc_info),
-                mock.call.stopTest(test),
+            mock.call.enterGroup(self.it),
+            mock.call.startTest(test),
+            mock.call.addFailure(test, exc_info),
+            mock.call.stopTest(test),
+            mock.call.exitGroup(self.it),
         ])
 
     def test_it_can_error(self):
@@ -65,9 +69,11 @@ class TestDescribeTests(TestCase, PatchMixin):
                     raise
 
         self.result.assert_has_calls([
-                mock.call.startTest(test),
-                mock.call.addError(test, exc_info),
-                mock.call.stopTest(test),
+            mock.call.enterGroup(self.it),
+            mock.call.startTest(test),
+            mock.call.addError(test, exc_info),
+            mock.call.stopTest(test),
+            mock.call.exitGroup(self.it),
         ])
 
     def test_it_does_not_swallow_KeyboardInterrupts(self):
@@ -89,9 +95,11 @@ class TestDescribeTests(TestCase, PatchMixin):
                 self.ran_test = True
 
         self.assertEqual(self.result.mock_calls, [
+            mock.call.enterGroup(self.it),
             mock.call.startTest(example),
             mock.call.addError(example, mock.ANY),  # traceback object
             mock.call.stopTest(example),
+            mock.call.exitGroup(self.it),
         ])
         self.assertFalse(self.ran_test)
 
@@ -141,7 +149,9 @@ class TestDescribeTests(TestCase, PatchMixin):
                 test.fail("Should have skipped!")
 
         self.assertEqual(self.result.method_calls, [
+            mock.call.enterGroup(self.it),
             mock.call.startTest(test),
             mock.call.addSkip(test, "A good one"),
             mock.call.stopTest(test),
+            mock.call.exitGroup(self.it),
         ])

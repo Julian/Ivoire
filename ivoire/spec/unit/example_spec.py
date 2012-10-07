@@ -1,6 +1,4 @@
 from ivoire.standalone import Example, describe
-import ivoire
-
 from ivoire.spec.util import ExampleWithPatch, mock
 
 
@@ -37,8 +35,3 @@ with describe(Example, Example=ExampleWithPatch) as it:
 
         test.assertNotEqual(hash(test.example), hash(other))
         test.assertNotEqual(hash(test.example), hash(another))
-
-    with it("raises a ValueError if the global result is not set") as test:
-        test.patchObject(ivoire, "current_result", None)
-        with test.assertRaises(ValueError):
-            Example(test.name, test.example_group)

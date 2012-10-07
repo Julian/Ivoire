@@ -20,6 +20,9 @@ class ExampleResult(TestResult):
         super(ExampleResult, self).startTestRun()
         self._start = time.time()
 
+    def enterGroup(self, group):
+        self.formatter.show(self.formatter.enter_group(group))
+
     def addError(self, example, exc_info):
         super(ExampleResult, self).addError(example, exc_info)
         self.formatter.show(self.formatter.error(example, exc_info))
@@ -35,6 +38,9 @@ class ExampleResult(TestResult):
     def addSkip(self, example, reason):
         super(ExampleResult, self).addSkip(example, reason)
         self.formatter.show(self.formatter.skip(example, reason))
+
+    def exitGroup(self, group):
+        self.formatter.show(self.formatter.exit_group(group))
 
     def stopTestRun(self):
         super(ExampleResult, self).stopTestRun()
@@ -159,6 +165,22 @@ class DotsFormatter(FormatterMixin):
         self.stream.write(text)
         self.stream.flush()
 
+    def enter_group(self, group):
+        """
+        A new example group was entered.
+
+        """
+
+        return ""
+
+    def exit_group(self, group):
+        """
+        The example group was entered.
+
+        """
+
+        return ""
+
     def result_summary(self, result):
         """
         Return a summary of the results.
@@ -220,11 +242,9 @@ class DotsFormatter(FormatterMixin):
 
 class Verbose(FormatterMixin):
     """
-    Show verbose output (including example and group descriptions.
+    Show verbose output (including example and group descriptions).
 
     """
-
-    _last_group = None
 
     def __init__(self, formatter):
         self._formatter = formatter
@@ -232,27 +252,17 @@ class Verbose(FormatterMixin):
     def __getattr__(self, attr):
         return getattr(self._formatter, attr)
 
+    def enter_group(self, group):
+        return "{}\n".format(group)
+
     def finished(self):
         self.show("\n")
 
     def error(self, example, exc_info):
-        self.maybe_show_group(example.group)
         return indent(str(example), 4 * " ") + " - ERROR\n"
 
     def failure(self, example, exc_info):
-        self.maybe_show_group(example.group)
         return indent(str(example), 4 * " ") + " - FAIL\n"
 
     def success(self, example):
-        self.maybe_show_group(example.group)
         return indent(str(example), 4 * " ") + "\n"
-
-    def maybe_show_group(self, group):
-        """
-        Show the given example group if it is different than the last seen.
-
-        """
-
-        if group != self._last_group:
-            self.show(str(group) + "\n")
-        self._last_group = group

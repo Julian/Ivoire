@@ -7,8 +7,8 @@ The rest of the specification is written as a pyUnit test case (in the
 """
 
 from ivoire.standalone import ExampleGroup, describe
-
 from ivoire.spec.util import ExampleWithPatch, mock
+import ivoire
 
 
 with describe(describe, Example=ExampleWithPatch) as it:
@@ -54,6 +54,12 @@ with describe(describe, Example=ExampleWithPatch) as it:
         OtherExample = mock.Mock()
         group = describe(ExampleGroup, Example=OtherExample)
         test.assertEqual(group.Example, OtherExample)
+
+    with it("raises a ValueError if the global result is not set") as test:
+        test.patchObject(ivoire, "current_result", None)
+        with test.assertRaises(ValueError):
+            with test.it:
+                pass
 
 
 with describe(ExampleGroup, Example=ExampleWithPatch) as it:

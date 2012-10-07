@@ -21,20 +21,12 @@ class Example(TestCase):
     """
 
     def __init__(self, name, group, before=None, after=None):
-        result = self.__result = ivoire.current_result
-
-        if result is None:
-            raise ValueError(
-                "ivoire.current_result must be set to a TestResult before "
-                "execution starts!"
-            )
-
         super(Example, self).__init__(_MAKE_UNITTEST_SHUT_UP)
-
         self.__after = after
         self.__before = before
         self.__group = group
         self.__name = name
+        self.__result = group.result
 
     def __enter__(self):
         """
@@ -111,6 +103,7 @@ class ExampleGroup(object):
 
     _before = _after = None
     failureException = None
+    result = None
 
     def __init__(self, describes, Example=Example):
         self.Example = Example
@@ -123,9 +116,12 @@ class ExampleGroup(object):
 
         """
 
+        self.result = self._get_result()
+        self.result.enterGroup(self)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self.result.exitGroup(self)
         if exc_type == _ShouldStop:
             return True
 
@@ -155,6 +151,20 @@ class ExampleGroup(object):
 
         self.add_example(example)
         return example
+
+    def _get_result(self):
+        """
+        Find the global result object.
+
+        """
+
+        result = ivoire.current_result
+        if result is None:
+            raise ValueError(
+                "ivoire.current_result must be set to a TestResult before "
+                "execution starts!"
+            )
+        return result
 
     def add_example(self, example):
         """
