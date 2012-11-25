@@ -77,8 +77,8 @@ with describe(result.ExampleResult, Example=ExampleWithPatch) as it:
         start, end = [1.234567, 8.9101112]
         test.patchObject(result.time, "time", side_effect=[start, end])
 
-        test.result.startTestRun()
-        test.result.stopTestRun()
+        test.result.startTest(mock.Mock())
+        test.result.stopTest(mock.Mock())
 
         test.assertEqual(test.result.elapsed, end - start)
 

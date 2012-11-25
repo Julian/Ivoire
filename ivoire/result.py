@@ -14,11 +14,12 @@ class ExampleResult(TestResult):
 
     def __init__(self, formatter):
         super(ExampleResult, self).__init__()
+        self.elapsed = 0
         self.formatter = formatter
 
-    def startTestRun(self):
-        super(ExampleResult, self).startTestRun()
-        self._start = time.time()
+    def startTest(self, example):
+        super(ExampleResult, self).startTest(example)
+        self._start_time = time.time()
 
     def enterGroup(self, group):
         self.formatter.show(self.formatter.enter_group(group))
@@ -42,9 +43,12 @@ class ExampleResult(TestResult):
     def exitGroup(self, group):
         self.formatter.show(self.formatter.exit_group(group))
 
+    def stopTest(self, example):
+        super(ExampleResult, self).stopTest(example)
+        self.elapsed += time.time() - self._start_time
+
     def stopTestRun(self):
         super(ExampleResult, self).stopTestRun()
-        self.elapsed = time.time() - self._start
 
         self.formatter.finished()
         self.formatter.show(self.formatter.errors(self.errors))
