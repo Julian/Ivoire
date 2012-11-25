@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from contextlib import contextmanager
 from unittest import SkipTest, TestCase, TestResult
 import sys
 
@@ -116,7 +117,7 @@ class ExampleGroup(object):
 
         """
 
-        self.result = self._get_result()
+        self.result = _get_result()
 
         enterGroup = getattr(self.result, "enterGroup", None)
         if enterGroup is not None:
@@ -159,20 +160,6 @@ class ExampleGroup(object):
         self.add_example(example)
         return example
 
-    def _get_result(self):
-        """
-        Find the global result object.
-
-        """
-
-        result = ivoire.current_result
-        if result is None:
-            raise ValueError(
-                "ivoire.current_result must be set to a TestResult before "
-                "execution starts!"
-            )
-        return result
-
     def add_example(self, example):
         """
         Add an existing ``Example`` to this group.
@@ -207,3 +194,39 @@ class ExampleGroup(object):
 
 
 describe = ExampleGroup
+
+
+class Context(object):
+    def __init__(self, name):
+        self.name = name
+
+
+@contextmanager
+def context(*args, **kwargs):
+    result = _get_result()
+    context = Context(*args, **kwargs)
+
+    enterContext = getattr(result, "enterContext", None)
+    if enterContext is not None:
+        result.enterContext(context)
+
+    yield context
+
+    exitContext = getattr(result, "exitContext", None)
+    if exitContext is not None:
+        result.exitContext(context)
+
+
+def _get_result():
+    """
+    Find the global result object.
+
+    """
+
+    result = ivoire.current_result
+    if result is None:
+        raise ValueError(
+            "ivoire.current_result must be set to a TestResult before "
+            "execution starts!"
+        )
+    return result
