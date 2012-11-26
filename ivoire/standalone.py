@@ -196,25 +196,18 @@ class ExampleGroup(object):
 describe = ExampleGroup
 
 
-class Context(object):
-    def __init__(self, name):
-        self.name = name
-
-
 @contextmanager
-def context(*args, **kwargs):
+def context(description):
     result = _get_result()
-    context = Context(*args, **kwargs)
-
     enterContext = getattr(result, "enterContext", None)
     if enterContext is not None:
-        result.enterContext(context)
+        result.enterContext(description)
 
-    yield context
+    yield
 
     exitContext = getattr(result, "exitContext", None)
     if exitContext is not None:
-        result.exitContext(context)
+        result.exitContext()
 
 
 def _get_result():

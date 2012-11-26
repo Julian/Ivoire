@@ -136,17 +136,17 @@ class TestDescribeTests(TestCase, PatchMixin):
 
     def test_it_can_have_contexts(self):
         with self.it as it:
-            with context("a test context") as test_context:
+            with context("a test context"):
                 with it("has a test") as test:
                     pass
 
         self.assertEqual(self.result.method_calls, [
             mock.call.enterGroup(self.it),
-            mock.call.enterContext(test_context),
+            mock.call.enterContext("a test context"),
             mock.call.startTest(test),
             mock.call.addSuccess(test),
             mock.call.stopTest(test),
-            mock.call.exitContext(test_context),
+            mock.call.exitContext(),
             mock.call.exitGroup(self.it),
         ])
 
