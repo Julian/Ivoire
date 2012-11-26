@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-from contextlib import contextmanager
 from unittest import SkipTest, TestCase, TestResult
 import sys
 
@@ -194,20 +193,6 @@ class ExampleGroup(object):
 
 
 describe = ExampleGroup
-
-
-@contextmanager
-def context(description):
-    result = _get_result()
-    enterContext = getattr(result, "enterContext", None)
-    if enterContext is not None:
-        result.enterContext(description)
-
-    yield
-
-    exitContext = getattr(result, "exitContext", None)
-    if exitContext is not None:
-        result.exitContext()
 
 
 def _get_result():

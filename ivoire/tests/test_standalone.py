@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 from unittest import TestCase
 import sys
 
-from ivoire.standalone import context, describe
+from ivoire.standalone import describe
 from ivoire.tests.util import PatchMixin, mock
 
 
@@ -134,22 +134,6 @@ class TestDescribeTests(TestCase, PatchMixin):
                 doCleanups = self.patchObject(test, "doCleanups")
         self.assertTrue(doCleanups.called)
 
-    def test_it_can_have_contexts(self):
-        with self.it as it:
-            with context("a test context"):
-                with it("has a test") as test:
-                    pass
-
-        self.assertEqual(self.result.method_calls, [
-            mock.call.enterGroup(self.it),
-            mock.call.enterContext("a test context"),
-            mock.call.startTest(test),
-            mock.call.addSuccess(test),
-            mock.call.stopTest(test),
-            mock.call.exitContext(),
-            mock.call.exitGroup(self.it),
-        ])
-
     def test_it_respects_shouldStop(self):
         with self.it as it:
             with it("does a thing") as test:
@@ -170,28 +154,6 @@ class TestDescribeTests(TestCase, PatchMixin):
             mock.call.stopTest(test),
             mock.call.exitGroup(self.it),
         ])
-
-    def test_it_only_calls_enterContext_if_result_knows_how(self):
-        del self.result.enterContext
-
-        with self.it as it:
-            with context("a test context") as test_context:
-                    pass
-
-        self.assertNotIn(
-            mock.call.enterContext(test_context), self.result.method_calls,
-        )
-
-    def test_it_only_calls_exitContext_if_result_knows_how(self):
-        del self.result.exitContext
-
-        with self.it as it:
-            with context("a test context") as test_context:
-                    pass
-
-        self.assertNotIn(
-            mock.call.exitContext(test_context), self.result.method_calls,
-        )
 
     def test_it_only_calls_enterGroup_if_result_knows_how(self):
         del self.result.enterGroup

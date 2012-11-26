@@ -12,8 +12,10 @@ Globals defined in this module:
 """
 
 from ivoire.standalone import Example, describe
+from ivoire.manager import ContextManager
 
 
 __version__ = "0.2dev"
 
 current_result = None
+context = ContextManager().create_context
