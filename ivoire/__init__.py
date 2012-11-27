@@ -17,5 +17,7 @@ from ivoire.manager import ContextManager
 
 __version__ = "0.2dev"
 
+_manager = ContextManager()
+context = _manager.create_context
+
 current_result = None
-context = ContextManager(current_result).create_context

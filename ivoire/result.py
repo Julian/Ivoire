@@ -20,6 +20,12 @@ class ExampleResult(TestResult):
         super(ExampleResult, self).startTestRun()
         self._start = time.time()
 
+    def enterContext(self, context, depth):
+        self.formatter.show(self.formatter.enter_context(context, depth))
+
+    def exitContext(self, depth):
+        self.formatter.show(self.formatter.exit_context(depth))
+
     def enterGroup(self, group):
         self.formatter.show(self.formatter.enter_group(group))
 
@@ -165,6 +171,22 @@ class DotsFormatter(FormatterMixin):
         self.stream.write(text)
         self.stream.flush()
 
+    def enter_context(self, context, depth):
+        """
+        A new context was entered.
+
+        """
+
+        return ""
+
+    def exit_context(self, depth):
+        """
+        A context was exited.
+
+        """
+
+        return ""
+
     def enter_group(self, group):
         """
         A new example group was entered.
@@ -247,10 +269,19 @@ class Verbose(FormatterMixin):
     """
 
     def __init__(self, formatter):
+        self._depth = 1
         self._formatter = formatter
 
     def __getattr__(self, attr):
         return getattr(self._formatter, attr)
+
+    def enter_context(self, context, depth):
+        self._depth = depth + 1
+        return indent(context.name + "\n", depth * 4 * " ")
+
+    def exit_context(self, depth):
+        self._depth = depth + 1
+        return ""
 
     def enter_group(self, group):
         return "{}\n".format(group)
@@ -259,10 +290,10 @@ class Verbose(FormatterMixin):
         self.show("\n")
 
     def error(self, example, exc_info):
-        return indent(str(example), 4 * " ") + " - ERROR\n"
+        return indent(str(example), self._depth * 4 * " ") + " - ERROR\n"
 
     def failure(self, example, exc_info):
-        return indent(str(example), 4 * " ") + " - FAIL\n"
+        return indent(str(example), self._depth * 4 * " ") + " - FAIL\n"
 
     def success(self, example):
-        return indent(str(example), 4 * " ") + "\n"
+        return indent(str(example), self._depth * 4 * " ") + "\n"

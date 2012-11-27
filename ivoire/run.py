@@ -80,7 +80,7 @@ def setup(config):
 
     current_result = result.ExampleResult(formatter)
 
-    ivoire.current_result = current_result
+    ivoire.current_result = ivoire._manager.result = current_result
 
 
 def run(config):
