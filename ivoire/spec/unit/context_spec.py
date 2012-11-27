@@ -12,4 +12,4 @@ with describe(Context, Example=ExampleWithPatch) as it:
     with it("calls its manager when used as a context manager") as test:
         with test.context:
             test.manager.enter.assert_called_once_with(test.context)
-        test.manager.exit.assert_called_once_with(test.context)
+        test.manager.exit.assert_called_once_with()

@@ -48,4 +48,4 @@ class Context(object):
 
         """
 
-        self.manager.exit(self)
+        self.manager.exit()
