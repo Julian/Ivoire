@@ -1,6 +1,6 @@
 class ContextManager(object):
-    def __init__(self, result):
-        self.context_depth = 1
+    def __init__(self, result=None):
+        self.context_depth = 0
         self.result = result
 
     def create_context(self, name):
