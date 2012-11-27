@@ -1,5 +1,7 @@
 class ContextManager(object):
-    context_depth = 1
+    def __init__(self, result):
+        self.context_depth = 1
+        self.result = result
 
     def create_context(self, name):
         return Context(name, self)
@@ -7,8 +9,16 @@ class ContextManager(object):
     def enter(self, context):
         self.context_depth += 1
 
-    def exit(self, context):
+        enterContext = getattr(self.result, "enterContext", None)
+        if enterContext is not None:
+            enterContext(context, depth=self.context_depth)
+
+    def exit(self):
         self.context_depth -= 1
+
+        exitContext = getattr(self.result, "exitContext", None)
+        if exitContext is not None:
+            exitContext(depth=self.context_depth)
 
 
 class Context(object):
