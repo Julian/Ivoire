@@ -25,7 +25,7 @@ with describe(Calculator) as it:
     with it("multiplies two numbers") as test:
         test.assertEqual(test.calc.multiply(2, 3), 6)
 
-    with context("divide"):
+    with context(Calculator.divide):
         with it("divides two numbers") as test:
             test.assertEqual(test.calc.divide(8, 4), 2)
 
