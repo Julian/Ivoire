@@ -15,7 +15,7 @@ from ivoire.standalone import Example, describe
 from ivoire.manager import ContextManager
 
 
-__version__ = "0.2dev"
+__version__ = "0.2"
 
 _manager = ContextManager()
 context = _manager.create_context
