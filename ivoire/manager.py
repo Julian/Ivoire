@@ -3,7 +3,8 @@ class ContextManager(object):
         self.context_depth = 0
         self.result = result
 
-    def create_context(self, name):
+    def create_context(self, for_target):
+        name = getattr(for_target, "__name__", for_target)
         return Context(name, self)
 
     def enter(self, context):

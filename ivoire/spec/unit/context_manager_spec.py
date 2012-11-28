@@ -1,4 +1,4 @@
-from ivoire import describe, ContextManager
+from ivoire import context, describe, ContextManager
 from ivoire.manager import Context
 from ivoire.spec.util import ExampleWithPatch, mock
 
@@ -10,9 +10,15 @@ with describe(ContextManager, Example=ExampleWithPatch) as it:
         test.manager = ContextManager(test.result)
         test.context = test.manager.create_context("a test context")
 
-    with it("creates contexts") as test:
-        context = test.manager.create_context("a test context")
-        test.assertEqual(context, Context("a test context", test.manager))
+    with context(context):
+        with it("creates contexts") as test:
+            context = test.manager.create_context("a test context")
+            test.assertEqual(context, Context("a test context", test.manager))
+
+        with it("is a bit nasty and tries to get __name__s") as test:
+            def foo(): pass
+            context = test.manager.create_context(foo)
+            test.assertEqual(context, Context("foo", test.manager))
 
     with it("starts off at a global context depth of 0") as test:
         test.assertEqual(test.manager.context_depth, 0)
