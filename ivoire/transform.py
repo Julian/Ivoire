@@ -2,7 +2,7 @@ import ast
 import sys
 
 
-from ivoire.compat import FileFinder, SourceFileLoader
+from ivoire.compat import FileFinder, SourceFileLoader, transform_possible  # noqa: E501, F401
 
 
 class ExampleTransformer(ast.NodeTransformer):
