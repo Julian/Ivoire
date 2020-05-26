@@ -148,6 +148,7 @@ class ExampleTransformer(ast.NodeTransformer):
             defaults=[],
             kw_defaults=[],
             kwonlyargs=[],
+            posonlyargs=[],
         )
 
 

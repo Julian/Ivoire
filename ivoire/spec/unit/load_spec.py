@@ -56,7 +56,7 @@ with describe(load.filter_specs, Example=ExampleWithPatch) as it:
 with describe(load.discover, Example=ExampleWithPatch) as it:
     with it("discovers specs") as test:
         subdirs = mock.Mock()
-        files, more_files = [mock.Mock()], [mock.Mock(), mock.Mock()]
+        files, more_files = ["one"], ["two", "three"]
 
         tree = [("dir", subdirs, files), ("dir/child", subdirs, more_files)]
         walk = test.patchObject(load.os, "walk", return_value=tree)
@@ -65,6 +65,7 @@ with describe(load.discover, Example=ExampleWithPatch) as it:
 
         specs = list(load.discover("a/path", filter_specs=no_filter))
 
-        test.assertEqual(specs, files + more_files)
+        expected = ["dir/one", "dir/child/two", "dir/child/three"]
+        test.assertEqual(specs, expected)
         test.assertTrue(no_filter.called)
         walk.assert_called_once_with("a/path")
