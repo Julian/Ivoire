@@ -47,7 +47,7 @@ with describe(describe, Example=ExampleWithPatch) as it:
 
     with it("counts its examples") as test:
         test.assertEqual(test.it.countTestCases(), 0)
-        test.it.add_example(mock.Mock(**{"countTestCases.return_value" : 3}))
+        test.it.add_example(mock.Mock(**{"countTestCases.return_value": 3}))
         test.assertEqual(test.it.countTestCases(), 3)
 
     with it("can have Example specified") as test:

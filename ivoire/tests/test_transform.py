@@ -1,5 +1,4 @@
 from __future__ import print_function
-from textwrap import dedent
 from unittest import TestCase, skipIf
 import ast
 

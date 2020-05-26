@@ -14,7 +14,7 @@ import ivoire
 
 
 FORMATTERS = {
-    "dots" : result.DotsFormatter,
+    "dots": result.DotsFormatter,
 }
 
 
@@ -149,7 +149,7 @@ _run.add_argument(
     choices=FORMATTERS,
     default="dots",
     dest="Formatter",
-    type=lambda formatter : FORMATTERS[formatter],
+    type=lambda formatter: FORMATTERS[formatter],
     help="Format output with the given formatter.",
 )
 _run.add_argument(

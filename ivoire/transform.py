@@ -2,7 +2,7 @@ import ast
 import sys
 
 
-from ivoire.compat import FileFinder, SourceFileLoader, transform_possible
+from ivoire.compat import FileFinder, SourceFileLoader
 
 
 class ExampleTransformer(ast.NodeTransformer):
@@ -136,7 +136,6 @@ class ExampleTransformer(ast.NodeTransformer):
                     if child.id == context_variable:
                         child.id = "self"
             yield node
-
 
     def takes_only_self(self):
         """

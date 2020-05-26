@@ -78,7 +78,7 @@ class TestDescribeTests(TestCase, PatchMixin):
     def test_it_does_not_swallow_KeyboardInterrupts(self):
         with self.assertRaises(KeyboardInterrupt):
             with self.it as it:
-                with it("does a thing") as test:
+                with it("does a thing"):
                     raise KeyboardInterrupt
 
     def test_it_exits_the_group_if_begin_errors(self):
@@ -90,7 +90,7 @@ class TestDescribeTests(TestCase, PatchMixin):
                 raise RuntimeError("Buggy before.")
 
             example = it("should not be run")
-            with example as test:
+            with example:
                 self.ran_test = True
 
         self.assertEqual(self.result.mock_calls, [
@@ -122,7 +122,7 @@ class TestDescribeTests(TestCase, PatchMixin):
             def after(test):
                 self.foo = 12
 
-            with it("should have set foo after") as test:
+            with it("should have set foo after"):
                 foo = self.foo
 
         self.assertEqual(foo, None)
@@ -136,7 +136,7 @@ class TestDescribeTests(TestCase, PatchMixin):
 
     def test_it_respects_shouldStop(self):
         with self.it as it:
-            with it("does a thing") as test:
+            with it("does a thing"):
                 self.result.shouldStop = True
             self.fail("should have stopped already!")  # pragma: no cover
 
@@ -158,7 +158,7 @@ class TestDescribeTests(TestCase, PatchMixin):
     def test_it_only_calls_enterGroup_if_result_knows_how(self):
         del self.result.enterGroup
 
-        with self.it as it:
+        with self.it:
             pass
 
         self.assertEqual(
@@ -168,7 +168,7 @@ class TestDescribeTests(TestCase, PatchMixin):
     def test_it_only_calls_exitGroup_if_result_knows_how(self):
         del self.result.exitGroup
 
-        with self.it as it:
+        with self.it:
             pass
 
         self.assertEqual(

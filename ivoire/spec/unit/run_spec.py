@@ -12,12 +12,12 @@ with describe(run.parse, Example=ExampleWithPatch) as it:
         should_color = test.patchObject(run, "should_color")
         arguments = run.parse(test.specs)
         test.assertEqual(vars(arguments), {
-            "Formatter" : result.DotsFormatter,
-            "color" : should_color.return_value,
-            "exitfirst" : False,
-            "specs" : test.specs,
-            "func" : run.run,
-            "verbose" : False,
+            "Formatter": result.DotsFormatter,
+            "color": should_color.return_value,
+            "exitfirst": False,
+            "specs": test.specs,
+            "func": run.run,
+            "verbose": False,
         })
         should_color.assert_called_once_with("auto")
 
@@ -38,9 +38,9 @@ with describe(run.parse, Example=ExampleWithPatch) as it:
     with it("can transform") as test:
         arguments = run.parse(["transform", "foo", "bar"])
         test.assertEqual(vars(arguments), {
-            "runner" : "foo",
-            "args" : ["bar"],
-            "func" : run.transform,
+            "runner": "foo",
+            "args": ["bar"],
+            "func": run.transform,
         })
 
     with it("runs run on empty args") as test:
@@ -177,7 +177,7 @@ with describe(run.transform, Example=ExampleWithPatch) as it:
         argv = test.patchObject(run.sys, "argv", ["spam", "eggs"])
 
         # argv was set immediately before run_path
-        test.run_path.side_effect = lambda *a, **k : (
+        test.run_path.side_effect = lambda *a, **k: (
             test.assertEqual(argv[1:], test.config.args)
         )
         run.transform(test.config)

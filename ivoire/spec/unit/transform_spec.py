@@ -5,7 +5,7 @@ import ast
 import copy
 
 from ivoire import describe, transform
-from ivoire.spec.util import ExampleWithPatch, mock
+from ivoire.spec.util import ExampleWithPatch
 
 
 def dump(node):  # pragma: no cover
@@ -49,7 +49,7 @@ with describe(transform.ExampleTransformer, Example=ExampleWithPatch) as it:
 
     with it("transforms ivoire imports to unittest imports") as test:
         execute(test, "from ivoire import describe")
-        test.assertEqual(test.locals, {"TestCase" : TestCase})
+        test.assertEqual(test.locals, {"TestCase": TestCase})
 
     with it("leaves other imports alone") as test:
         assertNotTransformed(test, "from textwrap import dedent")

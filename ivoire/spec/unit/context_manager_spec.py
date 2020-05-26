@@ -16,7 +16,8 @@ with describe(ContextManager, Example=ExampleWithPatch) as it:
             test.assertEqual(context, Context("a test context", test.manager))
 
         with it("is a bit nasty and tries to get __name__s") as test:
-            def foo(): pass
+            def foo():
+                pass
             context = test.manager.create_context(foo)
             test.assertEqual(context, Context("foo", test.manager))
 

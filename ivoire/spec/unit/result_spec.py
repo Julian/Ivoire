@@ -3,7 +3,6 @@ from io import StringIO
 import sys
 
 from ivoire import describe, result
-from ivoire.compat import indent
 from ivoire.spec.util import ExampleWithPatch, mock
 
 

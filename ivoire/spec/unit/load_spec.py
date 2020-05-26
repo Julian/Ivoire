@@ -61,7 +61,7 @@ with describe(load.discover, Example=ExampleWithPatch) as it:
         tree = [("dir", subdirs, files), ("dir/child", subdirs, more_files)]
         walk = test.patchObject(load.os, "walk", return_value=tree)
 
-        no_filter = mock.Mock(side_effect=lambda paths : paths)
+        no_filter = mock.Mock(side_effect=lambda paths: paths)
 
         specs = list(load.discover("a/path", filter_specs=no_filter))
 

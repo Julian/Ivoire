@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from unittest import SkipTest, TestCase, TestResult
+from unittest import SkipTest, TestCase
 import sys
 
 import ivoire
@@ -9,7 +9,7 @@ class _ShouldStop(Exception):
     pass
 
 
-# TestCase requires the name of an existing method on creation in 2.X because 
+# TestCase requires the name of an existing method on creation in 2.X because
 # of the way the default implementation of .run() works. So make it shut up.
 _MAKE_UNITTEST_SHUT_UP = "__init__"
 
