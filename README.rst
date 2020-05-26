@@ -2,8 +2,7 @@
 Ivoire
 ======
 
-.. image:: https://secure.travis-ci.org/Julian/Ivoire.png
-    :alt: Travis CI Build Status
+|PyPI| |Pythons| |CI| |Codecov|
 
 ``ivoire`` is an `RSpec <http://rspec.info/>`_-like testing framework for
 Python. It aims to bring a few minor constructs over to Python in a way that
@@ -13,11 +12,27 @@ In case you've never heard of RSpec, it's a Ruby
 `BDD <http://en.wikipedia.org/wiki/Behavior_driven_development>`_ framework
 that is fairly widely used, and whose tests have a style unique from xUnit's.
 
+.. |PyPI| image:: https://img.shields.io/pypi/v/Ivoire.svg
+  :alt: PyPI version
+  :target: https://pypi.org/project/Ivoire/
+
+.. |Pythons| image:: https://img.shields.io/pypi/pyversions/Ivoire.svg
+  :alt: Supported Python versions
+  :target: https://pypi.org/project/Ivoire/
+
+.. |CI| image:: https://github.com/Julian/Ivoire/workflows/CI/badge.svg
+  :alt: Build status
+  :target: https://github.com/Julian/Ivoire/actions?query=workflow%3ACI
+
+.. |Codecov| image:: https://codecov.io/gh/Julian/Ivoire/branch/master/graph/badge.svg
+  :alt: Codecov Code coverage
+  :target: https://codecov.io/gh/Julian/Ivoire
+
 
 Installation
 ------------
 
-Ivoire is on `PyPi <http://pypi.python.org/pypi/ivoire>`_ and can be installed
+Ivoire is on `PyPI <http://pypi.python.org/pypi/ivoire>`_ and can be installed
 via ``pip install ivoire`` (or via your preferred installation method).
 
 At this point you should consider Ivoire to be experimental, and there are
@@ -102,8 +117,7 @@ Contributing
 I'm Julian Berman.
 
 You can find me on Freenode in ``#python-testing`` and various other channels
-(nick: ``tos9``) if you'd like to chat, or if there's enough interest in such a
-thing, in ``##ivoire``.
+(nick: ``tos9``) if you'd like to chat.
 
 Ivoire is developed on `GitHub <http://github.com/Julian/Ivoire>`_.
 
