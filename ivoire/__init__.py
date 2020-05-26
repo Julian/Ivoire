@@ -10,12 +10,16 @@ Globals defined in this module:
     __version__: The current version information
 
 """
+try:
+    from importlib import metadata
+except ImportError:
+    import importlib_metadata as metadata
 
 from ivoire.standalone import Example, describe
 from ivoire.manager import ContextManager
 
 
-__version__ = "0.2"
+__version__ = metadata.version("ivoire")
 
 _manager = ContextManager()
 context = _manager.create_context
