@@ -6,8 +6,8 @@ on:
   release:
     types: [published]
   schedule:
-    # Daily at 3:21
-    - cron: '21 3 * * *'
+    # Daily at 4:21
+    - cron: '21 4 * * *'
 
 jobs:
   ci:
@@ -17,14 +17,6 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest]
         python-version:
-          - name: pypy2
-            toxenv: pypy2
-          - name: pypy2
-            toxenv: build
-          - name: pypy2
-            toxenv: safety
-          - name: pypy2
-            toxenv: style
           - name: pypy3
             toxenv: pypy3
           - name: pypy3
@@ -35,17 +27,21 @@ jobs:
             toxenv: secrets
           - name: pypy3
             toxenv: safety
-          - name: 3.6
-            toxenv: py36
-          - name: 3.7
-            toxenv: py37
+          - name: pypy3
+            toxenv: style
           - name: 3.8
             toxenv: py38
+          - name: 3.9
+            toxenv: py39
+          - name: "3.10"
+            toxenv: py310
+          - name: "3.11"
+            toxenv: py311
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version.name }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version.name }}
     - name: Ensure we have new enough versions to respect python_version
