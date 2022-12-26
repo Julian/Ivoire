@@ -6,12 +6,12 @@ The rest of the specification is written as a pyUnit test case (in the
 
 """
 
-from ivoire.standalone import ExampleGroup, describe
 from ivoire.spec.util import ExampleWithPatch, mock
+from ivoire.standalone import ExampleGroup, describe
 import ivoire
 
-
 with describe(describe, Example=ExampleWithPatch) as it:
+
     @it.before
     def before(test):
         test.describes = mock.Mock(__name__="DescribedThing")
@@ -32,7 +32,8 @@ with describe(describe, Example=ExampleWithPatch) as it:
     with it("passes along failureException to Examples") as test:
         test.it.failureException = mock.Mock()
         test.assertEqual(
-            test.it("Example").failureException, test.it.failureException,
+            test.it("Example").failureException,
+            test.it.failureException,
         )
 
     with it("leaves the default failureException alone") as test:

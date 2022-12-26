@@ -40,7 +40,7 @@ class ExampleTransformer(ast.NodeTransformer):
 
         """
 
-        withitem, = node.items
+        (withitem,) = node.items
         context = withitem.context_expr
 
         if context.func.id == "describe":
@@ -83,7 +83,7 @@ class ExampleTransformer(ast.NodeTransformer):
         """
 
         for node in body:
-            withitem, = node.items
+            (withitem,) = node.items
             context_expr = withitem.context_expr
 
             name = context_expr.args[0].s

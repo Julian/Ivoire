@@ -1,9 +1,9 @@
-from ivoire import context, describe, ContextManager
+from ivoire import ContextManager, context, describe
 from ivoire.manager import Context
 from ivoire.spec.util import ExampleWithPatch, mock
 
-
 with describe(ContextManager, Example=ExampleWithPatch) as it:
+
     @it.before
     def before(test):
         test.result = mock.Mock()
@@ -16,8 +16,10 @@ with describe(ContextManager, Example=ExampleWithPatch) as it:
             test.assertEqual(context, Context("a test context", test.manager))
 
         with it("is a bit nasty and tries to get __name__s") as test:
+
             def foo():
                 pass
+
             context = test.manager.create_context(foo)
             test.assertEqual(context, Context("foo", test.manager))
 

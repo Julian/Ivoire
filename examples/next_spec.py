@@ -5,7 +5,6 @@ A spec for the next() standard library function.
 
 from ivoire import describe
 
-
 with describe(next) as it:
     with it("returns the next element of an iterable") as test:
         iterable = iter(range(5))

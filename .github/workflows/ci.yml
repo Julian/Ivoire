@@ -7,7 +7,7 @@ on:
     types: [published]
   schedule:
     # Daily at 4:21
-    - cron: '21 4 * * *'
+    - cron: "21 4 * * *"
 
 env:
   PIP_DISABLE_PIP_VERSION_CHECK: "1"

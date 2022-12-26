@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from unittest import SkipTest, TestCase
 import sys
 
@@ -21,7 +20,7 @@ class Example(TestCase):
     """
 
     def __init__(self, name, group, before=None, after=None):
-        super(Example, self).__init__(_MAKE_UNITTEST_SHUT_UP)
+        super().__init__(_MAKE_UNITTEST_SHUT_UP)
         self.__after = after
         self.__before = before
         self.__group = group
@@ -95,7 +94,7 @@ class Example(TestCase):
             raise SkipTest(reason)
 
 
-class ExampleGroup(object):
+class ExampleGroup:
     """
     ``ExampleGroup``s group together a number of ``Example``s.
 
@@ -150,7 +149,10 @@ class ExampleGroup(object):
         """
 
         example = self.Example(
-            name=name, group=self, before=self._before, after=self._after,
+            name=name,
+            group=self,
+            before=self._before,
+            after=self._after,
         )
 
         if self.failureException is not None:

@@ -1,9 +1,7 @@
-from __future__ import unicode_literals
+from textwrap import indent
 from unittest import TestResult
 import sys
 import time
-
-from textwrap import indent
 
 
 class ExampleResult(TestResult):
@@ -13,11 +11,11 @@ class ExampleResult(TestResult):
     """
 
     def __init__(self, formatter):
-        super(ExampleResult, self).__init__()
+        super().__init__()
         self.formatter = formatter
 
     def startTestRun(self):
-        super(ExampleResult, self).startTestRun()
+        super().startTestRun()
         self._start = time.time()
 
     def enterContext(self, context, depth):
@@ -30,26 +28,26 @@ class ExampleResult(TestResult):
         self.formatter.show(self.formatter.enter_group(group))
 
     def addError(self, example, exc_info):
-        super(ExampleResult, self).addError(example, exc_info)
+        super().addError(example, exc_info)
         self.formatter.show(self.formatter.error(example, exc_info))
 
     def addFailure(self, example, exc_info):
-        super(ExampleResult, self).addFailure(example, exc_info)
+        super().addFailure(example, exc_info)
         self.formatter.show(self.formatter.failure(example, exc_info))
 
     def addSuccess(self, example):
-        super(ExampleResult, self).addSuccess(example)
+        super().addSuccess(example)
         self.formatter.show(self.formatter.success(example))
 
     def addSkip(self, example, reason):
-        super(ExampleResult, self).addSkip(example, reason)
+        super().addSkip(example, reason)
         self.formatter.show(self.formatter.skip(example, reason))
 
     def exitGroup(self, group):
         self.formatter.show(self.formatter.exit_group(group))
 
     def stopTestRun(self):
-        super(ExampleResult, self).stopTestRun()
+        super().stopTestRun()
         self.elapsed = time.time() - self._start
 
         self.formatter.finished()
@@ -60,7 +58,7 @@ class ExampleResult(TestResult):
         )
 
 
-class FormatterMixin(object):
+class FormatterMixin:
     """
     Provide some higher-level formatting using the child's building blocks.
 
@@ -133,7 +131,9 @@ class Colored(FormatterMixin):
         """
 
         return "{escape}{text}{reset}".format(
-            escape=self.ANSI[color], text=text, reset=self.ANSI["reset"],
+            escape=self.ANSI[color],
+            text=text,
+            reset=self.ANSI["reset"],
         )
 
     def error(self, example, exc_info):
@@ -210,7 +210,9 @@ class DotsFormatter(FormatterMixin):
         """
 
         return "{} examples, {} errors, {} failures\n".format(
-            result.testsRun, len(result.errors), len(result.failures),
+            result.testsRun,
+            len(result.errors),
+            len(result.failures),
         )
 
     def timing(self, elapsed):

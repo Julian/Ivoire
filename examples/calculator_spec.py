@@ -3,10 +3,10 @@ A simple calculator specification.
 
 """
 
-from ivoire import describe, context
+from ivoire import context, describe
 
 
-class Calculator(object):
+class Calculator:
     def add(self, x, y):
         return x + y
 
@@ -15,6 +15,7 @@ class Calculator(object):
 
 
 with describe(Calculator) as it:
+
     @it.before
     def before(test):
         test.calc = Calculator()

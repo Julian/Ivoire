@@ -1,8 +1,8 @@
-from ivoire.standalone import Example, describe
 from ivoire.spec.util import ExampleWithPatch, mock
-
+from ivoire.standalone import Example, describe
 
 with describe(Example, Example=ExampleWithPatch) as it:
+
     @it.before
     def before(test):
         test.name = "the name of the Example"

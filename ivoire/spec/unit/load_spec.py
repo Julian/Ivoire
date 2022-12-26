@@ -1,8 +1,8 @@
 from ivoire import describe, load
 from ivoire.spec.util import ExampleWithPatch, mock
 
-
 with describe(load.load_by_name, Example=ExampleWithPatch) as it:
+
     @it.before
     def before(test):
         test.path_exists = test.patchObject(load.os.path, "exists")
@@ -21,6 +21,7 @@ with describe(load.load_by_name, Example=ExampleWithPatch) as it:
 
 
 with describe(load.load_from_path, Example=ExampleWithPatch) as it:
+
     @it.before
     def before(test):
         test.isdir = test.patchObject(load.os.path, "isdir")
@@ -34,11 +35,14 @@ with describe(load.load_from_path, Example=ExampleWithPatch) as it:
 
         load.load_from_path(test.path)
 
-        test.assertEqual(test.load_source.mock_calls, [
-            mock.call("bar", "foo/bar"),
-            mock.call("baz", "bar/baz"),
-            mock.call("quux", "baz/quux"),
-        ])
+        test.assertEqual(
+            test.load_source.mock_calls,
+            [
+                mock.call("bar", "foo/bar"),
+                mock.call("baz", "bar/baz"),
+                mock.call("quux", "baz/quux"),
+            ],
+        )
 
     with it("loads paths") as test:
         test.isdir.return_value = False

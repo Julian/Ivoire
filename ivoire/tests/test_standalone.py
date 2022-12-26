@@ -8,7 +8,7 @@ by the surrounding test case.
 
 """
 
-from __future__ import unicode_literals
+
 from unittest import TestCase
 import sys
 
@@ -33,13 +33,15 @@ class TestDescribeTests(TestCase, PatchMixin):
             with it("does a thing") as test:
                 pass
 
-        self.result.assert_has_calls([
-            mock.call.enterGroup(self.it),
-            mock.call.startTest(test),
-            mock.call.addSuccess(test),
-            mock.call.stopTest(test),
-            mock.call.exitGroup(self.it),
-        ])
+        self.result.assert_has_calls(
+            [
+                mock.call.enterGroup(self.it),
+                mock.call.startTest(test),
+                mock.call.addSuccess(test),
+                mock.call.stopTest(test),
+                mock.call.exitGroup(self.it),
+            ],
+        )
 
     def test_it_can_fail(self):
         with self.it as it:
@@ -50,13 +52,15 @@ class TestDescribeTests(TestCase, PatchMixin):
                     exc_info = sys.exc_info()
                     raise
 
-        self.result.assert_has_calls([
-            mock.call.enterGroup(self.it),
-            mock.call.startTest(test),
-            mock.call.addFailure(test, exc_info),
-            mock.call.stopTest(test),
-            mock.call.exitGroup(self.it),
-        ])
+        self.result.assert_has_calls(
+            [
+                mock.call.enterGroup(self.it),
+                mock.call.startTest(test),
+                mock.call.addFailure(test, exc_info),
+                mock.call.stopTest(test),
+                mock.call.exitGroup(self.it),
+            ],
+        )
 
     def test_it_can_error(self):
         with self.it as it:
@@ -67,13 +71,15 @@ class TestDescribeTests(TestCase, PatchMixin):
                     exc_info = sys.exc_info()
                     raise
 
-        self.result.assert_has_calls([
-            mock.call.enterGroup(self.it),
-            mock.call.startTest(test),
-            mock.call.addError(test, exc_info),
-            mock.call.stopTest(test),
-            mock.call.exitGroup(self.it),
-        ])
+        self.result.assert_has_calls(
+            [
+                mock.call.enterGroup(self.it),
+                mock.call.startTest(test),
+                mock.call.addError(test, exc_info),
+                mock.call.stopTest(test),
+                mock.call.exitGroup(self.it),
+            ],
+        )
 
     def test_it_does_not_swallow_KeyboardInterrupts(self):
         with self.assertRaises(KeyboardInterrupt):
@@ -85,6 +91,7 @@ class TestDescribeTests(TestCase, PatchMixin):
         self.ran_test = False
 
         with self.it as it:
+
             @it.before
             def before(test):
                 raise RuntimeError("Buggy before.")
@@ -93,17 +100,21 @@ class TestDescribeTests(TestCase, PatchMixin):
             with example:
                 self.ran_test = True
 
-        self.assertEqual(self.result.mock_calls, [
-            mock.call.enterGroup(self.it),
-            mock.call.startTest(example),
-            mock.call.addError(example, mock.ANY),  # traceback object
-            mock.call.stopTest(example),
-            mock.call.exitGroup(self.it),
-        ])
+        self.assertEqual(
+            self.result.mock_calls,
+            [
+                mock.call.enterGroup(self.it),
+                mock.call.startTest(example),
+                mock.call.addError(example, mock.ANY),  # traceback object
+                mock.call.stopTest(example),
+                mock.call.exitGroup(self.it),
+            ],
+        )
         self.assertFalse(self.ran_test)
 
     def test_it_runs_befores(self):
         with self.it as it:
+
             @it.before
             def before(test):
                 test.foo = 12
@@ -118,6 +129,7 @@ class TestDescribeTests(TestCase, PatchMixin):
         self.foo = None
 
         with self.it as it:
+
             @it.after
             def after(test):
                 self.foo = 12
@@ -147,13 +159,16 @@ class TestDescribeTests(TestCase, PatchMixin):
                 test.skip_if(True, reason="A good one")
                 test.fail("Should have skipped!")
 
-        self.assertEqual(self.result.method_calls, [
-            mock.call.enterGroup(self.it),
-            mock.call.startTest(test),
-            mock.call.addSkip(test, "A good one"),
-            mock.call.stopTest(test),
-            mock.call.exitGroup(self.it),
-        ])
+        self.assertEqual(
+            self.result.method_calls,
+            [
+                mock.call.enterGroup(self.it),
+                mock.call.startTest(test),
+                mock.call.addSkip(test, "A good one"),
+                mock.call.stopTest(test),
+                mock.call.exitGroup(self.it),
+            ],
+        )
 
     def test_it_only_calls_enterGroup_if_result_knows_how(self):
         del self.result.enterGroup
@@ -162,7 +177,8 @@ class TestDescribeTests(TestCase, PatchMixin):
             pass
 
         self.assertEqual(
-            self.result.method_calls, [mock.call.exitGroup(self.it)],
+            self.result.method_calls,
+            [mock.call.exitGroup(self.it)],
         )
 
     def test_it_only_calls_exitGroup_if_result_knows_how(self):
@@ -172,5 +188,6 @@ class TestDescribeTests(TestCase, PatchMixin):
             pass
 
         self.assertEqual(
-            self.result.method_calls, [mock.call.enterGroup(self.it)],
+            self.result.method_calls,
+            [mock.call.enterGroup(self.it)],
         )

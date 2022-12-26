@@ -8,10 +8,11 @@ def _cleanUpPatch(fn):
         patch = fn(*args, **kwargs)
         self.addCleanup(patch.stop)
         return patch.start()
+
     return cleaned
 
 
-class PatchMixin(object):
+class PatchMixin:
     patch = _cleanUpPatch(mock.patch)
     patchDict = _cleanUpPatch(mock.patch.dict)
     patchObject = _cleanUpPatch(mock.patch.object)

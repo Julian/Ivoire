@@ -12,13 +12,12 @@ from ivoire.load import load_by_name
 from ivoire.transform import ExampleLoader
 import ivoire
 
-
 FORMATTERS = {
     "dots": result.DotsFormatter,
 }
 
 
-class _ExampleNotRunning(object):
+class _ExampleNotRunning:
     """
     An error occurred, but no example was running. Mimic an Example object.
 
@@ -138,14 +137,16 @@ _run = _subparsers.add_parser(
     help="Run Ivoire specs.",
 )
 _run.add_argument(
-    "-c", "--color",
+    "-c",
+    "--color",
     choices=["always", "never", "auto"],
     default="auto",
     dest="color",
     help="Format colored output.",
 )
 _run.add_argument(
-    "-f", "--formatter",
+    "-f",
+    "--formatter",
     choices=FORMATTERS,
     default="dots",
     dest="Formatter",
@@ -153,12 +154,14 @@ _run.add_argument(
     help="Format output with the given formatter.",
 )
 _run.add_argument(
-    "-v", "--verbose",
+    "-v",
+    "--verbose",
     action="store_true",
     help="Format verbose output.",
 )
 _run.add_argument(
-    "-x", "--exitfirst",
+    "-x",
+    "--exitfirst",
     action="store_true",
     help="Exit after the first error or failure.",
 )
@@ -168,7 +171,7 @@ _run.set_defaults(func=run)
 _transform = _subparsers.add_parser(
     "transform",
     help="Run an Ivoire spec through another test runner by translating its "
-         "source code.",
+    "source code.",
 )
 _transform.add_argument(
     "runner",

@@ -1,6 +1,5 @@
-from __future__ import unicode_literals
-from unittest import TestCase
 from textwrap import indent
+from unittest import TestCase
 
 from ivoire import result
 from ivoire.tests.util import PatchMixin, mock
@@ -22,14 +21,16 @@ class TestFormatterMixin(TestCase, PatchMixin):
         self.formatter.traceback.side_effect = ["a\nb\n", "c\nd\n"]
         errors = [(mock.Mock(), mock.Mock()), (mock.Mock(), mock.Mock())]
         self.assertEqual(
-            self.formatter.errors(errors), "Errors:\n\na\nb\n\nc\nd\n\n",
+            self.formatter.errors(errors),
+            "Errors:\n\na\nb\n\nc\nd\n\n",
         )
 
     def test_failures(self):
         self.formatter.traceback.side_effect = ["a\nb\n", "c\nd\n"]
         failures = [(mock.Mock(), mock.Mock()), (mock.Mock(), mock.Mock())]
         self.assertEqual(
-            self.formatter.failures(failures), "Failures:\n\na\nb\n\nc\nd\n\n",
+            self.formatter.failures(failures),
+            "Failures:\n\na\nb\n\nc\nd\n\n",
         )
 
     def test_return_nothing_if_no_errors(self):
@@ -65,7 +66,8 @@ class TestColored(TestCase, PatchMixin):
     def test_it_colors_successes_green(self):
         self.formatter.success.return_value = "S"
         self.assertEqual(
-            self.colored.success(self.test), self.colored.color("green", "S"),
+            self.colored.success(self.test),
+            self.colored.color("green", "S"),
         )
 
     def test_it_colors_failures_red(self):

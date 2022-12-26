@@ -1,4 +1,3 @@
-from __future__ import print_function
 from unittest import TestCase
 import ast
 
@@ -11,7 +10,9 @@ class TestRegistration(TestCase, PatchMixin):
         self.FileFinder = self.patchObject(transform, "FileFinder")
         self.hooks = ()
         self.path_hooks = self.patchObject(
-            transform.sys, "path_hooks", list(self.hooks),
+            transform.sys,
+            "path_hooks",
+            list(self.hooks),
         )
 
     def test_it_registers_a_file_finder(self):
@@ -44,6 +45,9 @@ class TestExampleLoader(TestCase, PatchMixin):
 
         self.assertEqual(code, compile.return_value)
         compile.assert_called_once_with(
-            trans.return_value, path, "exec", dont_inherit=True,
+            trans.return_value,
+            path,
+            "exec",
+            dont_inherit=True,
         )
         trans.assert_called_once_with(parse.return_value)

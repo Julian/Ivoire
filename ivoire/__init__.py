@@ -12,9 +12,8 @@ Globals defined in this module:
 """
 from importlib import metadata
 
-from ivoire.standalone import Example, describe  # noqa: F401
 from ivoire.manager import ContextManager
-
+from ivoire.standalone import Example, describe  # noqa: F401
 
 __version__ = metadata.version("ivoire")
 

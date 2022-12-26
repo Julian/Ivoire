@@ -84,7 +84,7 @@ Here's an example of what a specification looks like.
 You can find this example at ``examples/calculator_spec.py``, alongside a few
 others.
 
-After installing Ivoire, running the example above with 
+After installing Ivoire, running the example above with
 ``ivoire examples/calculator_spec.py`` should produce:
 
 .. image:: https://github.com/Julian/Ivoire/raw/master/examples/img/calculator_spec_output.png

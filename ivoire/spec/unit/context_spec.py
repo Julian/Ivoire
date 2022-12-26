@@ -2,8 +2,8 @@ from ivoire import describe
 from ivoire.manager import Context
 from ivoire.spec.util import ExampleWithPatch, mock
 
-
 with describe(Context, Example=ExampleWithPatch) as it:
+
     @it.before
     def before(test):
         test.manager = mock.Mock()

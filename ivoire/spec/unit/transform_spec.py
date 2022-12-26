@@ -1,4 +1,3 @@
-from __future__ import print_function
 from textwrap import dedent
 from unittest import TestCase
 import ast
@@ -9,16 +8,19 @@ from ivoire.spec.util import ExampleWithPatch
 
 
 def dump(node):  # pragma: no cover
-    return dedent("""
+    return dedent(
+        f"""
     --- Dumping Node ---
 
-    {}
+    {ast.dump(node)}
 
     --- End ---
-    """.format(ast.dump(node)))
+    """,
+    )
 
 
 with describe(transform.ExampleTransformer, Example=ExampleWithPatch) as it:
+
     @it.before
     def before(test):
         test.transformer = transform.ExampleTransformer()
@@ -55,13 +57,16 @@ with describe(transform.ExampleTransformer, Example=ExampleWithPatch) as it:
         assertNotTransformed(test, "from textwrap import dedent")
 
     with it("transforms uses of describe to TestCases") as test:
-        execute(test, """
+        execute(
+            test,
+            """
             from ivoire import describe
             with describe(next) as it:
                 with it("returns the next element") as test:
                     test.i = [1, 2, 3]
                     test.assertEqual(next(test.i), 1)
-        """)
+        """,
+        )
 
         TestNext = test.locals["TestNext"]
         test = TestNext("test_it_returns_the_next_element")
@@ -69,9 +74,12 @@ with describe(transform.ExampleTransformer, Example=ExampleWithPatch) as it:
         test.assertEqual(test.i, [1, 2, 3])
 
     with it("leaves other context managers alone") as test:
-        assertNotTransformed(test, """
+        assertNotTransformed(
+            test,
+            """
             from warnings import catchwarnings
             with catchwarnings() as thing:
                 with catchwarnings():
                     pass
-        """)
+        """,
+        )

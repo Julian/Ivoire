@@ -1,4 +1,4 @@
-class ContextManager(object):
+class ContextManager:
     def __init__(self, result=None):
         self.context_depth = 0
         self.result = result
@@ -22,7 +22,7 @@ class ContextManager(object):
             exitContext(depth=self.context_depth)
 
 
-class Context(object):
+class Context:
     def __init__(self, name, manager):
         self.manager = manager
         self.name = name

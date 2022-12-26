@@ -8,12 +8,12 @@ Is this a good idea?
 
 I don't know! I think it's interesting. I also think it should be done in a way
 that doesn't require too much investment and risk, which is why I chose to do
-it in a way that also can be transparently (or explicitly if necessary) 
+it in a way that also can be transparently (or explicitly if necessary)
 translated back into "normal" ``unittest.TestCase``\s, so that existing tools
 can make use of the specs.
 
 For what it's worth, I think the latter is also a good demo of a simple thing
-you can do with import hooks (path hooks), which can be confusing or magick-y 
+you can do with import hooks (path hooks), which can be confusing or magick-y
 but hopefully also do some good.
 
 To be a bit more specific, I like the renaming and refocusing that BDD tries to
@@ -32,7 +32,7 @@ Why does it only support transformation in Python 3.3?
 ------------------------------------------------------
 
 Mostly since the Python import stack has been done and redone a few times over
-its lifetime, most recently in the form of ``importlib``. Python 3.3 has a 
+its lifetime, most recently in the form of ``importlib``. Python 3.3 has a
 bunch of useful things that make it easy to do what Ivoire needs to do without
 reimplementing things like ``__import__``. So, until I get a chance to try out
 the backports of ``importlib``, it's going to need to be Python 3.3+ for that.
@@ -59,7 +59,7 @@ Well boo you.
 What are some good complimentary libraries to use?
 --------------------------------------------------
 
-Michael Foord's `mock <http://www.voidspace.org.uk/python/mock/>`_, which is 
+Michael Foord's `mock <http://www.voidspace.org.uk/python/mock/>`_, which is
 now in the standard library starting with Python 3.3 as the ``unittest.mock``
 library.
 

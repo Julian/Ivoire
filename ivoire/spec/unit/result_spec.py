@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from io import StringIO
 import sys
 
@@ -14,6 +13,7 @@ def fake_exc_info():
 
 
 with describe(result.ExampleResult, Example=ExampleWithPatch) as it:
+
     @it.before
     def before(test):
         test.formatter = mock.Mock()
@@ -47,7 +47,8 @@ with describe(result.ExampleResult, Example=ExampleWithPatch) as it:
     with it("shows failures") as test:
         test.result.addFailure(test.test, test.exc_info)
         test.formatter.failure.assert_called_once_with(
-            test.test, test.exc_info,
+            test.test,
+            test.exc_info,
         )
         assertShown(test, test.formatter.failure.return_value)
 
@@ -62,15 +63,17 @@ with describe(result.ExampleResult, Example=ExampleWithPatch) as it:
 
         elapsed = test.result.elapsed
 
-        test.formatter.assert_has_calls([
-            mock.call.finished(),
-            mock.call.errors(test.result.errors),
-            mock.call.show(test.formatter.errors.return_value),
-            mock.call.failures(test.result.failures),
-            mock.call.show(test.formatter.failures.return_value),
-            mock.call.statistics(elapsed=elapsed, result=test.result),
-            mock.call.show(test.formatter.statistics.return_value),
-        ])
+        test.formatter.assert_has_calls(
+            [
+                mock.call.finished(),
+                mock.call.errors(test.result.errors),
+                mock.call.show(test.formatter.errors.return_value),
+                mock.call.failures(test.result.failures),
+                mock.call.show(test.formatter.failures.return_value),
+                mock.call.statistics(elapsed=elapsed, result=test.result),
+                mock.call.show(test.formatter.statistics.return_value),
+            ],
+        )
 
     with it("times the example run") as test:
         start, end = [1.234567, 8.9101112]
@@ -83,6 +86,7 @@ with describe(result.ExampleResult, Example=ExampleWithPatch) as it:
 
 
 with describe(result.Verbose, Example=ExampleWithPatch) as it:
+
     @it.before
     def before(test):
         test.exc_info = mock.Mock()
@@ -106,7 +110,8 @@ with describe(result.Verbose, Example=ExampleWithPatch) as it:
 
     with it("formats successes") as test:
         test.assertEqual(
-            test.verbose.success(test.test), "    {}\n".format(test.test),
+            test.verbose.success(test.test),
+            "    {}\n".format(test.test),
         )
 
     with it("formats errors") as test:
@@ -123,6 +128,7 @@ with describe(result.Verbose, Example=ExampleWithPatch) as it:
 
 
 with describe(result.DotsFormatter, Example=ExampleWithPatch) as it:
+
     @it.before
     def before(test):
         test.elapsed = 1.23456789
@@ -179,6 +185,7 @@ with describe(result.DotsFormatter, Example=ExampleWithPatch) as it:
 
 
 with describe(result.DotsFormatter.show, Example=ExampleWithPatch) as it:
+
     @it.before
     def before(test):
         test.stream = StringIO()
