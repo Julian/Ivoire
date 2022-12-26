@@ -1,9 +1,5 @@
 from functools import wraps
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
+from unittest import mock
 
 
 def _cleanUpPatch(fn):

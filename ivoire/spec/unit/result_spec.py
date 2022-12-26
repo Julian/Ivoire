@@ -47,7 +47,7 @@ with describe(result.ExampleResult, Example=ExampleWithPatch) as it:
     with it("shows failures") as test:
         test.result.addFailure(test.test, test.exc_info)
         test.formatter.failure.assert_called_once_with(
-            test.test, test.exc_info
+            test.test, test.exc_info,
         )
         assertShown(test, test.formatter.failure.return_value)
 
@@ -101,24 +101,24 @@ with describe(result.Verbose, Example=ExampleWithPatch) as it:
     with it("shows group names when entered") as test:
         test.assertEqual(
             test.verbose.enter_group(test.test.group),
-            "{}\n".format(test.test.group)
+            "{}\n".format(test.test.group),
         )
 
     with it("formats successes") as test:
         test.assertEqual(
-            test.verbose.success(test.test), "    {}\n".format(test.test)
+            test.verbose.success(test.test), "    {}\n".format(test.test),
         )
 
     with it("formats errors") as test:
         test.assertEqual(
             test.verbose.error(test.test, test.exc_info),
-            "    {} - ERROR\n".format(test.test)
+            "    {} - ERROR\n".format(test.test),
         )
 
     with it("formats failures") as test:
         test.assertEqual(
             test.verbose.failure(test.test, test.exc_info),
-            "    {} - FAIL\n".format(test.test)
+            "    {} - FAIL\n".format(test.test),
         )
 
 
@@ -169,12 +169,12 @@ with describe(result.DotsFormatter, Example=ExampleWithPatch) as it:
 
     with it("formats tracebacks") as test:
         example = mock.MagicMock()
-        example.__str__.return_value = "Example"
+        example.__str__.return_value = "Example"  # type: ignore
         traceback = "The\nTraceback\n"
 
         test.assertEqual(
             test.formatter.traceback(example, traceback),
-            "\n".join([str(example), traceback])
+            "\n".join([str(example), traceback]),
         )
 
 

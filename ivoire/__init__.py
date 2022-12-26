@@ -10,12 +10,9 @@ Globals defined in this module:
     __version__: The current version information
 
 """
-try:
-    from importlib import metadata
-except ImportError:
-    import importlib_metadata as metadata
+from importlib import metadata
 
-from ivoire.standalone import Example, describe
+from ivoire.standalone import Example, describe  # noqa: F401
 from ivoire.manager import ContextManager
 
 

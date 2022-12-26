@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 from unittest import TestCase
+from textwrap import indent
 
 from ivoire import result
-from ivoire.compat import indent
 from ivoire.tests.util import PatchMixin, mock
 
 
@@ -22,14 +22,14 @@ class TestFormatterMixin(TestCase, PatchMixin):
         self.formatter.traceback.side_effect = ["a\nb\n", "c\nd\n"]
         errors = [(mock.Mock(), mock.Mock()), (mock.Mock(), mock.Mock())]
         self.assertEqual(
-            self.formatter.errors(errors), "Errors:\n\na\nb\n\nc\nd\n\n"
+            self.formatter.errors(errors), "Errors:\n\na\nb\n\nc\nd\n\n",
         )
 
     def test_failures(self):
         self.formatter.traceback.side_effect = ["a\nb\n", "c\nd\n"]
         failures = [(mock.Mock(), mock.Mock()), (mock.Mock(), mock.Mock())]
         self.assertEqual(
-            self.formatter.failures(failures), "Failures:\n\na\nb\n\nc\nd\n\n"
+            self.formatter.failures(failures), "Failures:\n\na\nb\n\nc\nd\n\n",
         )
 
     def test_return_nothing_if_no_errors(self):

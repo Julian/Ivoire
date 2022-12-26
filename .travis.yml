@@ -1,9 +1,0 @@
-language: python
-python:
-  - "pypy"
-  - "2.7"
-  - "3.2"
-install: python setup.py -q install
-script:
-    - nosetests
-    - ivoire ivoire

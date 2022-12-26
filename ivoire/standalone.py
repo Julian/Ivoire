@@ -137,7 +137,7 @@ class ExampleGroup(object):
 
     def __repr__(self):
         return "<{self.__class__.__name__} examples={self.examples}>".format(
-            self=self
+            self=self,
         )
 
     def __str__(self):
@@ -205,6 +205,6 @@ def _get_result():
     if result is None:
         raise ValueError(
             "ivoire.current_result must be set to a TestResult before "
-            "execution starts!"
+            "execution starts!",
         )
     return result

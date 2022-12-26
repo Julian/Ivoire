@@ -9,13 +9,13 @@ from ivoire.spec.util import ExampleWithPatch
 
 
 def dump(node):  # pragma: no cover
-    return(dedent("""
+    return dedent("""
     --- Dumping Node ---
 
     {}
 
     --- End ---
-    """.format(ast.dump(node))))
+    """.format(ast.dump(node)))
 
 
 with describe(transform.ExampleTransformer, Example=ExampleWithPatch) as it:
@@ -55,11 +55,6 @@ with describe(transform.ExampleTransformer, Example=ExampleWithPatch) as it:
         assertNotTransformed(test, "from textwrap import dedent")
 
     with it("transforms uses of describe to TestCases") as test:
-        test.skip_if(
-            not transform.transform_possible,
-            "Transform not available on this version."
-        )
-
         execute(test, """
             from ivoire import describe
             with describe(next) as it:
@@ -74,11 +69,6 @@ with describe(transform.ExampleTransformer, Example=ExampleWithPatch) as it:
         test.assertEqual(test.i, [1, 2, 3])
 
     with it("leaves other context managers alone") as test:
-        test.skip_if(
-            not transform.transform_possible,
-            "Transform not available on this version."
-        )
-
         assertNotTransformed(test, """
             from warnings import catchwarnings
             with catchwarnings() as thing:

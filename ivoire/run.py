@@ -9,7 +9,7 @@ import sys
 
 from ivoire import result
 from ivoire.load import load_by_name
-from ivoire.transform import ExampleLoader, transform_possible
+from ivoire.transform import ExampleLoader
 import ivoire
 
 
@@ -101,7 +101,8 @@ def run(config):
             load_by_name(spec)
         except Exception:
             ivoire.current_result.addError(
-                _ExampleNotRunning(), sys.exc_info()
+                _ExampleNotRunning(),
+                sys.exc_info(),
             )
 
     ivoire.current_result.stopTestRun()
@@ -115,14 +116,13 @@ def transform(config):
 
     """
 
-    if transform_possible:
-        ExampleLoader.register()
+    ExampleLoader.register()
 
-        args, sys.argv[1:] = sys.argv[1:], config.args
-        try:
-            return runpy.run_path(config.runner, run_name="__main__")
-        finally:
-            sys.argv[1:] = args
+    args, sys.argv[1:] = sys.argv[1:], config.args
+    try:
+        return runpy.run_path(config.runner, run_name="__main__")
+    finally:
+        sys.argv[1:] = args
 
 
 def main(argv=None):
@@ -135,7 +135,7 @@ _subparsers = _parser.add_subparsers()
 
 _run = _subparsers.add_parser(
     "run",
-    help="Run Ivoire specs."
+    help="Run Ivoire specs.",
 )
 _run.add_argument(
     "-c", "--color",
@@ -149,7 +149,7 @@ _run.add_argument(
     choices=FORMATTERS,
     default="dots",
     dest="Formatter",
-    type=lambda formatter: FORMATTERS[formatter],
+    type=lambda formatter: FORMATTERS[formatter],  # type: ignore
     help="Format output with the given formatter.",
 )
 _run.add_argument(
@@ -172,7 +172,7 @@ _transform = _subparsers.add_parser(
 )
 _transform.add_argument(
     "runner",
-    help="The command to run the transformed tests with."
+    help="The command to run the transformed tests with.",
 )
 _transform.add_argument(
     "args",

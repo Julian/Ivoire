@@ -1,0 +1,12 @@
+[flake8]
+ban-relative-imports = true
+inline-quotes = "
+ignore =
+    # Barring function calls in default args. Ha, no.
+    B008,
+    # See https://github.com/PyCQA/flake8-bugbear/issues/131
+    B306,
+    # (flake8 default) old PEP8 boolean operator line breaks
+    W503,
+    # conflicts with before()
+    F811,

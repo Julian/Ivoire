@@ -3,7 +3,7 @@ from unittest import TestResult
 import sys
 import time
 
-from ivoire.compat import indent
+from textwrap import indent
 
 
 class ExampleResult(TestResult):
@@ -56,7 +56,7 @@ class ExampleResult(TestResult):
         self.formatter.show(self.formatter.errors(self.errors))
         self.formatter.show(self.formatter.failures(self.failures))
         self.formatter.show(
-            self.formatter.statistics(elapsed=self.elapsed, result=self)
+            self.formatter.statistics(elapsed=self.elapsed, result=self),
         )
 
 

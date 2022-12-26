@@ -32,7 +32,7 @@ with describe(describe, Example=ExampleWithPatch) as it:
     with it("passes along failureException to Examples") as test:
         test.it.failureException = mock.Mock()
         test.assertEqual(
-            test.it("Example").failureException, test.it.failureException
+            test.it("Example").failureException, test.it.failureException,
         )
 
     with it("leaves the default failureException alone") as test:

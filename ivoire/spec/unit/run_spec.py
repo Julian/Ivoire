@@ -76,18 +76,25 @@ with describe(run.setup, Example=ExampleWithPatch) as it:
     with it("makes a plain Formatter if color and verbose are False") as test:
         run.setup(test.config)
         test.assertEqual(
-            ivoire.current_result.formatter, test.config.Formatter.return_value
+            ivoire.current_result.formatter,  # type: ignore
+            test.config.Formatter.return_value,
         )
 
     with it("makes a verbose Formatter if verbose is True") as test:
         test.config.verbose = True
         run.setup(test.config)
-        test.assertIsInstance(ivoire.current_result.formatter, result.Verbose)
+        test.assertIsInstance(
+            ivoire.current_result.formatter,  # type: ignore
+            result.Verbose,
+        )
 
     with it("makes a colored Formatter if color is True") as test:
         test.config.color = True
         run.setup(test.config)
-        test.assertIsInstance(ivoire.current_result.formatter, result.Colored)
+        test.assertIsInstance(
+            ivoire.current_result.formatter,  # type: ignore
+            result.Colored,
+        )
 
 
 with describe(run.run, Example=ExampleWithPatch) as it:
@@ -157,7 +164,6 @@ with describe(run.main, Example=ExampleWithPatch) as it:
 with describe(run.transform, Example=ExampleWithPatch) as it:
     @it.before
     def before(test):
-        test.patchObject(run, "transform_possible", True)
         test.ExampleLoader = test.patchObject(run, "ExampleLoader")
         test.config = mock.Mock(runner="runner", specs=["a/spec.py"], args=[])
         test.run_path = test.patchObject(run.runpy, "run_path")

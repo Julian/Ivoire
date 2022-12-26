@@ -1,5 +1,5 @@
 from __future__ import print_function
-from unittest import TestCase, skipIf
+from unittest import TestCase
 import ast
 
 from ivoire import transform
@@ -11,7 +11,7 @@ class TestRegistration(TestCase, PatchMixin):
         self.FileFinder = self.patchObject(transform, "FileFinder")
         self.hooks = ()
         self.path_hooks = self.patchObject(
-            transform.sys, "path_hooks", list(self.hooks)
+            transform.sys, "path_hooks", list(self.hooks),
         )
 
     def test_it_registers_a_file_finder(self):
@@ -31,10 +31,6 @@ class TestRegistration(TestCase, PatchMixin):
 
 
 class TestExampleLoader(TestCase, PatchMixin):
-    @skipIf(
-        not transform.transform_possible,
-        "Transformation isn't supported yet on this version.",
-    )
     def test_it_transforms_the_source(self):
         trans = self.patchObject(transform.ExampleTransformer, "transform")
         parse = self.patchObject(ast, "parse")
@@ -48,6 +44,6 @@ class TestExampleLoader(TestCase, PatchMixin):
 
         self.assertEqual(code, compile.return_value)
         compile.assert_called_once_with(
-            trans.return_value, path, "exec", dont_inherit=True
+            trans.return_value, path, "exec", dont_inherit=True,
         )
         trans.assert_called_once_with(parse.return_value)
