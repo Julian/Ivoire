@@ -151,7 +151,6 @@ class ExampleTransformer(ast.NodeTransformer):
 
 
 class ExampleLoader(SourceFileLoader):
-
     suffix = "_spec.py"
 
     @classmethod
