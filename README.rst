@@ -112,14 +112,8 @@ Contributing
 
 I'm Julian Berman.
 
-You can find me on Freenode in ``#python-testing`` and various other channels
-(nick: ``tos9``) if you'd like to chat.
-
 Ivoire is developed on `GitHub <http://github.com/Julian/Ivoire>`_.
 
-Feel free to fork and submit patches or feature requests. Your contributions
-are most welcome!
+Feel free to fork and submit patches or feature requests. Your contributions are most welcome!
 
-If you'd like the best chance for them to be merged quickly try to include
-tests with your pull request, and adhere to general Python coding standards and
-your own common sense :).
+If you'd like the best chance for them to be merged quickly try to include tests with your pull request, and adhere to general Python coding standards and your own common sense :).
