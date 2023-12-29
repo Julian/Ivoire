@@ -19,7 +19,7 @@ class TestRegistration(TestCase, PatchMixin):
         transform.ExampleLoader.register()
         self.assertEqual(
             self.path_hooks,
-            list(self.hooks) + [self.FileFinder.path_hook.return_value],
+            [*self.hooks, self.FileFinder.path_hook.return_value],
         )
         self.FileFinder.path_hook.assert_called_once_with(
             (transform.ExampleLoader, ["_spec.py"]),

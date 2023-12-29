@@ -1,6 +1,5 @@
 """
 The implementation of the Ivoire runner.
-
 """
 
 import argparse
@@ -33,9 +32,7 @@ class _ExampleNotRunning:
 def should_color(when):
     """
     Decide whether to color output.
-
     """
-
     if when == "auto":
         return sys.stderr.isatty()
     return when == "always"
@@ -44,15 +41,13 @@ def should_color(when):
 def parse(argv=None):
     """
     Parse some arguments using the parser.
-
     """
-
     if argv is None:
         argv = sys.argv[1:]
 
     # Evade http://bugs.python.org/issue9253
     if not argv or argv[0] not in {"run", "transform"}:
-        argv = ["run"] + argv
+        argv = ["run", *argv]
 
     arguments = _clean(_parser.parse_args(argv))
     return arguments
@@ -67,9 +62,7 @@ def _clean(arguments):
 def setup(config):
     """
     Setup the environment for an example run.
-
     """
-
     formatter = config.Formatter()
 
     if config.verbose:
@@ -85,9 +78,7 @@ def setup(config):
 def run(config):
     """
     Time to run.
-
     """
-
     setup(config)
 
     if config.exitfirst:
@@ -112,9 +103,7 @@ def run(config):
 def transform(config):
     """
     Run in transform mode.
-
     """
-
     ExampleLoader.register()
 
     args, sys.argv[1:] = sys.argv[1:], config.args
@@ -125,6 +114,9 @@ def transform(config):
 
 
 def main(argv=None):
+    """
+    The runner for Ivoire, a simple RSpec-like testing framework.
+    """
     arguments = parse(argv)
     arguments.func(arguments)
 
@@ -150,7 +142,7 @@ _run.add_argument(
     choices=FORMATTERS,
     default="dots",
     dest="Formatter",
-    type=lambda formatter: FORMATTERS[formatter],  # type: ignore
+    type=lambda formatter: FORMATTERS[formatter],  # type: ignore[arg-type, return-value]
     help="Format output with the given formatter.",
 )
 _run.add_argument(

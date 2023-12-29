@@ -19,9 +19,9 @@ authors = [
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
@@ -38,10 +38,99 @@ ivoire = "ivoire.run:main"
 [project.urls]
 Homepage = "https://github.com/Julian/Ivoire"
 Issues = "https://github.com/Julian/Ivoire/issues/"
+Funding = "https://github.com/sponsors/Julian"
 Source = "https://github.com/Julian/Ivoire"
+[tool.coverage.html]
+show_contexts = true
+skip_covered = false
+
+[tool.coverage.run]
+branch = true
+source = ["referencing"]
+dynamic_context = "test_function"
+
+[tool.coverage.report]
+exclude_also = [
+  "if TYPE_CHECKING:",
+  "\\s*\\.\\.\\.\\s*",
+]
+show_missing = true
+skip_covered = true
 
 [tool.isort]
 combine_as_imports = true
+ensure_newline_before_comments = true
 from_first = true
 include_trailing_comma = true
 multi_line_output = 3
+use_parentheses = true
+[tool.ruff]
+line-length = 79
+select = ["ALL"]
+ignore = [
+  "A001",  # It's fine to shadow builtins
+  "A002",
+  "A003",
+  "ARG",  # This is all wrong whenever an interface is involved
+  "ANN",  # Just let the type checker do this
+  "B008",  # It's totally OK to call functions for default arguments.
+  "B904",  # raise SomeException(...) is fine.
+  "B905",  # No need for explicit strict, this is simply zip's default behavior
+  "BLE001",  # Catching Exception is bad, except when it's what you intend.
+  "C408",  # Calling dict is fine when it saves quoting the keys
+  "C901",  # Not really something to focus on
+  "D105",  # It's fine to not have docstrings for magic methods.
+  "D107",  # __init__ especially doesn't need a docstring
+  "D200",  # This rule makes diffs uglier when expanding docstrings
+  "D203",  # No blank lines before docstrings.
+  "D212",  # Start docstrings on the second line.
+  "D400",  # This rule misses sassy docstrings ending with ! or ?
+  "D401",  # This rule is too flaky.
+  "D406",  # Section headers should end with a colon not a newline
+  "D407",  # Underlines aren't needed
+  "D412",  # Plz spaces after section headers
+  "EM101",  # These don't bother me, it's fine there's some duplication.
+  "EM102",
+  "FBT",  # It's worth avoiding boolean args but I don't care to enforce it
+  "FIX",  # Yes thanks, if I could it wouldn't be there
+  "I001",  # We can't yet use ruff's isort
+  "N",  # These naming rules are silly
+  "PERF203",  # Yes, it does incur a performance penalty.
+  "PLR0912",  # These metrics are fine to be aware of but not to enforce
+  "PLR0913",
+  "PLR0915",
+  "PLW2901",  # Shadowing for loop variables is occasionally fine.
+  "PT",  # We use unittest
+  "PYI025",  # wat, I'm not confused, thanks.
+  "RET502",  # Returning None implicitly is fine
+  "RET503",
+  "RET504",  # This is often for readability
+  "RET505",  # These push you to use `if` instead of `elif`, but for no reason
+  "RET506",
+  "RSE102",  # Ha, what, who even knew you could leave the parens off. But no.
+  "SIM117",  # Conflicts with Ivoire's style
+  "SIM300", # Not sure what heuristic this uses, but it's easily incorrect
+  "SLF001",  # Private usage within this package itself is fine
+  "TD",  # These TODO style rules are also silly
+  "UP007",  # We support 3.8 + 3.9
+]
+
+[tool.ruff.lint.flake8-pytest-style]
+mark-parentheses = false
+
+[tool.ruff.flake8-quotes]
+docstring-quotes = "double"
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+from-first = true
+
+[tool.ruff.per-file-ignores]
+"noxfile.py" = ["ANN", "D100", "S101", "T201"]
+"docs/*" = ["ANN", "D", "INP001"]
+"examples/*" = ["ANN", "D", "INP001"]
+"ivoire/result.py" = ["D102"]
+"ivoire/tests/*" = ["ANN", "D", "RUF012", "S", "PLR", "TRY"]
+"ivoire/spec/*" = ["ANN", "D", "RUF012", "S", "PLR", "TRY"]
+"ivoire/**/*_spec.py" = ["ANN", "D", "F811", "RUF012", "S", "PLR", "TRY"]
+"ivoire/**/spec/__init__.py" = ["ANN", "D", "RUF012", "S", "PLR", "TRY"]

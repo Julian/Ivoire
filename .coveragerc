@@ -1,5 +1,0 @@
-# vim: filetype=dosini:
-[run]
-branch = True
-source = ivoire
-dynamic_context = test_function

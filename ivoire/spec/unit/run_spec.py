@@ -25,17 +25,17 @@ with describe(run.parse, Example=ExampleWithPatch) as it:
         should_color.assert_called_once_with("auto")
 
     with it("can exitfirst") as test:
-        arguments = run.parse(["--exitfirst"] + test.specs)
+        arguments = run.parse(["--exitfirst", *test.specs])
         test.assertTrue(arguments.exitfirst)
 
-        arguments = run.parse(["-x"] + test.specs)
+        arguments = run.parse(["-x", *test.specs])
         test.assertTrue(arguments.exitfirst)
 
     with it("can be verbose") as test:
-        arguments = run.parse(["--verbose"] + test.specs)
+        arguments = run.parse(["--verbose", *test.specs])
         test.assertTrue(arguments.verbose)
 
-        arguments = run.parse(["-v"] + test.specs)
+        arguments = run.parse(["-v", *test.specs])
         test.assertTrue(arguments.verbose)
 
     with it("can transform") as test:
@@ -84,7 +84,7 @@ with describe(run.setup, Example=ExampleWithPatch) as it:
     with it("makes a plain Formatter if color and verbose are False") as test:
         run.setup(test.config)
         test.assertEqual(
-            ivoire.current_result.formatter,  # type: ignore
+            ivoire.current_result.formatter,  # type: ignore[attr-defined]
             test.config.Formatter.return_value,
         )
 
@@ -92,7 +92,7 @@ with describe(run.setup, Example=ExampleWithPatch) as it:
         test.config.verbose = True
         run.setup(test.config)
         test.assertIsInstance(
-            ivoire.current_result.formatter,  # type: ignore
+            ivoire.current_result.formatter,  # type: ignore[attr-defined]
             result.Verbose,
         )
 
@@ -100,7 +100,7 @@ with describe(run.setup, Example=ExampleWithPatch) as it:
         test.config.color = True
         run.setup(test.config)
         test.assertIsInstance(
-            ivoire.current_result.formatter,  # type: ignore
+            ivoire.current_result.formatter,  # type: ignore[attr-defined]
             result.Colored,
         )
 

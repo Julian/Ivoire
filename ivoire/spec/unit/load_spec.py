@@ -5,7 +5,7 @@ with describe(load.load_by_name, Example=ExampleWithPatch) as it:
 
     @it.before
     def before(test):
-        test.path_exists = test.patchObject(load.os.path, "exists")
+        test.path_exists = test.patchObject(load.Path, "exists")
         test.load_from_path = test.patchObject(load, "load_from_path")
         test.__import__ = test.patchObject(load, "__import__", create=True)
 
@@ -24,19 +24,20 @@ with describe(load.load_from_path, Example=ExampleWithPatch) as it:
 
     @it.before
     def before(test):
-        test.isdir = test.patchObject(load.os.path, "isdir")
-        test.load_source = test.patchObject(load.imp, "load_source")
+        test.is_dir = test.patchObject(load.Path, "is_dir")
+        test.SourceFileLoader = test.patchObject(load, "SourceFileLoader")
+        test.SourceFileLoader.return_value.name = "some name"
         test.path = "foo/bar"
 
     with it("discovers specs if given a directory") as test:
-        test.isdir.return_value = True
+        test.is_dir.return_value = True
         specs = ["foo/bar", "bar/baz", "baz/quux"]
         discover = test.patchObject(load, "discover", return_value=specs)
 
         load.load_from_path(test.path)
 
         test.assertEqual(
-            test.load_source.mock_calls,
+            test.SourceFileLoader.call_args_list,
             [
                 mock.call("bar", "foo/bar"),
                 mock.call("baz", "bar/baz"),
@@ -45,9 +46,9 @@ with describe(load.load_from_path, Example=ExampleWithPatch) as it:
         )
 
     with it("loads paths") as test:
-        test.isdir.return_value = False
+        test.is_dir.return_value = False
         load.load_from_path(test.path)
-        test.load_source.assert_called_once_with("bar", test.path)
+        test.SourceFileLoader.assert_called_once_with("bar", test.path)
 
 
 with describe(load.filter_specs, Example=ExampleWithPatch) as it:

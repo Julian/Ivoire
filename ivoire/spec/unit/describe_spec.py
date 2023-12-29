@@ -23,7 +23,7 @@ with describe(describe, Example=ExampleWithPatch) as it:
     with it("shows its name and examples as its repr") as test:
         test.assertEqual(
             repr(test.it),
-            "<{0.__class__.__name__} examples={0.examples}>".format(test.it),
+            f"<{test.it.__class__.__name__} examples={test.it.examples}>",
         )
 
     with it("sets the described object") as test:

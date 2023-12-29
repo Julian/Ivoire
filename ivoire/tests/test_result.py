@@ -43,7 +43,7 @@ class TestFormatterMixin(TestCase, PatchMixin):
         result_output = self.formatter.result_summary.return_value = "result\n"
 
         stats = self.formatter.statistics(elapsed=elapsed, result=result)
-        self.assertEqual(stats, "\n".join([timing_output, result_output]))
+        self.assertEqual(stats, f"{timing_output}\n{result_output}")
 
 
 class TestColored(TestCase, PatchMixin):

@@ -1,3 +1,6 @@
+"""
+Standalone mode for Ivoire.
+"""
 from unittest import SkipTest, TestCase
 import sys
 
@@ -30,9 +33,7 @@ class Example(TestCase):
     def __enter__(self):
         """
         Run the example.
-
         """
-
         self.__result.startTest(self)
 
         if self.__before is not None:
@@ -48,7 +49,6 @@ class Example(TestCase):
     def __exit__(self, exc_type, exc_value, traceback):
         """
         Finish running the example, logging any raised exceptions as results.
-
         """
         if exc_type is None:
             self.__result.addSuccess(self)
@@ -75,21 +75,22 @@ class Example(TestCase):
         return hash((self.__class__, self.group, self.__name))
 
     def __repr__(self):
-        return "<{self.__class__.__name__}: {self}>".format(self=self)
+        return f"<{self.__class__.__name__}: {self}>"
 
     def __str__(self):
         return self.__name
 
     @property
     def group(self):
+        """
+        The group this example belongs to.
+        """
         return self.__group
 
     def skip_if(self, condition, reason):
         """
         Skip the example if the condition is set, with the provided reason.
-
         """
-
         if condition:
             raise SkipTest(reason)
 
@@ -112,9 +113,7 @@ class ExampleGroup:
     def __enter__(self):
         """
         Begin running the group.
-
         """
-
         self.result = _get_result()
 
         enterGroup = getattr(self.result, "enterGroup", None)
@@ -135,9 +134,7 @@ class ExampleGroup:
         return iter(self.examples)
 
     def __repr__(self):
-        return "<{self.__class__.__name__} examples={self.examples}>".format(
-            self=self,
-        )
+        return f"<{self.__class__.__name__} examples={self.examples}>"
 
     def __str__(self):
         return self.describes.__name__
@@ -145,9 +142,7 @@ class ExampleGroup:
     def __call__(self, name):
         """
         Construct and return a new ``Example``.
-
         """
-
         example = self.Example(
             name=name,
             group=self,
@@ -164,9 +159,7 @@ class ExampleGroup:
     def add_example(self, example):
         """
         Add an existing ``Example`` to this group.
-
         """
-
         self.examples.append(example)
 
     def before(self, fn):
@@ -177,20 +170,16 @@ class ExampleGroup:
         so if a ``before`` function errors, the exception is propagated all the
         way up to the ``ExampleGroup`` (meaning the rest of the examples *will
         not run at all*, nor will they show up in the result output).
-
         """
-
         self._before = fn
 
     def after(self, fn):
         """
         Run the given function after each example is run.
-
         """
-
         self._after = fn
 
-    def countTestCases(self):
+    def countTestCases(self):  # noqa: D102
         return sum(example.countTestCases() for example in self)
 
 
@@ -200,12 +189,10 @@ describe = ExampleGroup
 def _get_result():
     """
     Find the global result object.
-
     """
-
     result = ivoire.current_result
     if result is None:
-        raise ValueError(
+        raise ValueError(  # noqa: TRY003
             "ivoire.current_result must be set to a TestResult before "
             "execution starts!",
         )

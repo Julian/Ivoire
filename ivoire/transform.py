@@ -1,3 +1,6 @@
+"""
+Source transforamtions for Ivoire specs.
+"""
 from importlib.machinery import FileFinder, SourceFileLoader
 import ast
 import sys
@@ -17,11 +20,17 @@ class ExampleTransformer(ast.NodeTransformer):
     """
 
     def transform(self, node):
+        """
+        Transform the given AST.
+        """
         transformed = self.visit(node)
         ast.fix_missing_locations(transformed)
         return transformed
 
     def visit_ImportFrom(self, node):
+        """
+        Transform imports of Ivoire specifically.
+        """
         if node.module == "ivoire":
             node.module = "unittest"
             node.names[0].name = "TestCase"
@@ -29,6 +38,8 @@ class ExampleTransformer(ast.NodeTransformer):
 
     def visit_With(self, node):
         """
+        Transform a with statement.
+
         with describe(thing) as it:
             ...
 
@@ -37,9 +48,7 @@ class ExampleTransformer(ast.NodeTransformer):
 
         class TestThing(TestCase):
             ...
-
         """
-
         (withitem,) = node.items
         context = withitem.context_expr
 
@@ -58,9 +67,7 @@ class ExampleTransformer(ast.NodeTransformer):
         ``describes`` is the name of the object being described.
         ``context_variable`` is the name bound in the context manager (usually
         "it").
-
         """
-
         body = self.transform_describe_body(node.body, context_variable)
         return ast.ClassDef(
             name="Test" + describes.title(),
@@ -79,9 +86,7 @@ class ExampleTransformer(ast.NodeTransformer):
         ``body`` is the body.
         ``group_var`` is the name bound to the example group in the context
         manager (usually "it").
-
         """
-
         for node in body:
             (withitem,) = node.items
             context_expr = withitem.context_expr
@@ -103,10 +108,8 @@ class ExampleTransformer(ast.NodeTransformer):
         "test").
         ``group_variable`` is the name bound in the surrounding example group's
         context manager (usually "it").
-
         """
-
-        test_name = "_".join(["test", group_variable] + name.split())
+        test_name = "_".join(["test", group_variable, *name.split()])
         body = self.transform_example_body(node.body, context_variable)
 
         return ast.FunctionDef(
@@ -125,22 +128,20 @@ class ExampleTransformer(ast.NodeTransformer):
         ``body`` is the body.
         ``context_variable`` is the name bound in the surrounding context
         manager to the example (usually "test").
-
         """
-
         for node in body:
             for child in ast.walk(node):
-                if isinstance(child, ast.Name):
-                    if child.id == context_variable:
-                        child.id = "self"
+                if (
+                    isinstance(child, ast.Name)
+                    and child.id == context_variable
+                ):
+                    child.id = "self"
             yield node
 
     def takes_only_self(self):
         """
         Return an argument list node that takes only ``self``.
-
         """
-
         return ast.arguments(
             args=[ast.arg(arg="self")],
             defaults=[],
@@ -151,15 +152,17 @@ class ExampleTransformer(ast.NodeTransformer):
 
 
 class ExampleLoader(SourceFileLoader):
+    """
+    A source loader for Ivoire spec files.
+    """
+
     suffix = "_spec.py"
 
     @classmethod
     def register(cls):
         """
         Register the path hook.
-
         """
-
         cls._finder = FileFinder.path_hook((cls, [cls.suffix]))
         sys.path_hooks.append(cls._finder)
 
@@ -167,17 +170,13 @@ class ExampleLoader(SourceFileLoader):
     def unregister(cls):
         """
         Unregister the path hook.
-
         """
-
         sys.path_hooks.remove(cls._finder)
 
     def source_to_code(self, source_bytes, source_path):
         """
         Transform the source code, then return the code object.
-
         """
-
         node = ast.parse(source_bytes)
         transformed = ExampleTransformer().transform(node)
         return compile(transformed, source_path, "exec", dont_inherit=True)

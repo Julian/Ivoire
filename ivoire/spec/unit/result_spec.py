@@ -105,25 +105,25 @@ with describe(result.Verbose, Example=ExampleWithPatch) as it:
     with it("shows group names when entered") as test:
         test.assertEqual(
             test.verbose.enter_group(test.test.group),
-            "{}\n".format(test.test.group),
+            f"{test.test.group}\n",
         )
 
     with it("formats successes") as test:
         test.assertEqual(
             test.verbose.success(test.test),
-            "    {}\n".format(test.test),
+            f"    {test.test}\n",
         )
 
     with it("formats errors") as test:
         test.assertEqual(
             test.verbose.error(test.test, test.exc_info),
-            "    {} - ERROR\n".format(test.test),
+            f"    {test.test} - ERROR\n",
         )
 
     with it("formats failures") as test:
         test.assertEqual(
             test.verbose.failure(test.test, test.exc_info),
-            "    {} - FAIL\n".format(test.test),
+            f"    {test.test} - FAIL\n",
         )
 
 
@@ -170,12 +170,12 @@ with describe(result.DotsFormatter, Example=ExampleWithPatch) as it:
     with it("formats a timing message") as test:
         test.assertEqual(
             test.formatter.timing(test.elapsed),
-            "Finished in {:.6f} seconds.\n".format(test.elapsed),
+            f"Finished in {test.elapsed:.6f} seconds.\n",
         )
 
     with it("formats tracebacks") as test:
         example = mock.MagicMock()
-        example.__str__.return_value = "Example"  # type: ignore
+        example.__str__.return_value = "Example"  # type: ignore[attr-defined]
         traceback = "The\nTraceback\n"
 
         test.assertEqual(

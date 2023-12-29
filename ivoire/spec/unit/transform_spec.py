@@ -34,7 +34,7 @@ with describe(transform.ExampleTransformer, Example=ExampleWithPatch) as it:
         try:
             exec(compiled, test.globals, test.locals)
         except Exception:  # pragma: no cover
-            print(dump(test.transformed))
+            print(dump(test.transformed))  # noqa: T201
             raise
 
     def assertNotTransformed(test, source):

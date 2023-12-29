@@ -15,7 +15,7 @@ with describe(Example, Example=ExampleWithPatch) as it:
     with it("shows its class and name in its repr") as test:
         test.assertEqual(
             repr(test.example),
-            "<{0.__class__.__name__}: {0}>".format(test.example),
+            f"<{test.example.__class__.__name__}: {test.example}>",
         )
 
     with it("knows its group") as test:
