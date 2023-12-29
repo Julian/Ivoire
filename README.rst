@@ -2,7 +2,7 @@
 Ivoire
 ======
 
-|PyPI| |Pythons| |CI| |Codecov|
+|PyPI| |Pythons| |CI|
 
 ``ivoire`` is an `RSpec <http://rspec.info/>`_-like testing framework for
 Python. It aims to bring a few minor constructs over to Python in a way that
@@ -23,10 +23,6 @@ that is fairly widely used, and whose tests have a style unique from xUnit's.
 .. |CI| image:: https://github.com/Julian/Ivoire/workflows/CI/badge.svg
   :alt: Build status
   :target: https://github.com/Julian/Ivoire/actions?query=workflow%3ACI
-
-.. |Codecov| image:: https://codecov.io/gh/Julian/Ivoire/branch/master/graph/badge.svg
-  :alt: Codecov Code coverage
-  :target: https://codecov.io/gh/Julian/Ivoire
 
 
 Installation
