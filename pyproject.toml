@@ -13,8 +13,7 @@ readme = "README.rst"
 license = {text = "MIT"}
 keywords = []
 authors = [
-  {email = "Julian+Ivoire@GrayVines.com"},
-  {name = "Julian Berman"},
+  { name = "Julian Berman", email = "Julian+Ivoire@GrayVines.com" },
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
