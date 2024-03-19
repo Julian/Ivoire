@@ -196,10 +196,10 @@ class DotsFormatter(FormatterMixin):
         """
         Return a summary of the results.
         """
-        return "{} examples, {} errors, {} failures\n".format(
-            result.testsRun,
-            len(result.errors),
-            len(result.failures),
+        return (
+            f"{result.testsRun} examples, "
+            f"{len(result.errors)} errors, "
+            f"{len(result.failures)} failures\n"
         )
 
     def timing(self, elapsed):
