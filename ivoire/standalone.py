@@ -52,7 +52,7 @@ class Example(TestCase):
         """
         if exc_type is None:
             self.__result.addSuccess(self)
-        elif exc_type == KeyboardInterrupt:
+        elif exc_type is KeyboardInterrupt:
             return False
         elif exc_type == SkipTest:
             self.__result.addSkip(self, str(exc_value))

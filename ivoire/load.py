@@ -24,9 +24,9 @@ def load_from_path(path):
     """
     paths = discover(path) if Path(path).is_dir() else [path]
 
-    for path in paths:
-        name = Path(path).stem
-        loader = SourceFileLoader(name, path)
+    for each in paths:
+        name = Path(each).stem
+        loader = SourceFileLoader(name, each)
         loader.exec_module(ModuleType(loader.name))
 
 
