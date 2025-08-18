@@ -40,7 +40,7 @@ class ContextManager:
             exitContext(depth=self.context_depth)
 
 
-class Context:
+class Context:  # noqa: PLW1641
     """
     An individual context.
     """
