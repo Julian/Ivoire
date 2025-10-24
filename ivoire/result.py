@@ -1,6 +1,7 @@
 """
 Spec results for Ivoire specs.
 """
+
 from textwrap import indent
 from unittest import TestResult
 import sys

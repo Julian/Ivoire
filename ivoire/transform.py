@@ -1,6 +1,7 @@
 """
 Source transforamtions for Ivoire specs.
 """
+
 from importlib.machinery import FileFinder, SourceFileLoader
 import ast
 import sys
@@ -73,7 +74,6 @@ class ExampleTransformer(ast.NodeTransformer):
             name="Test" + describes.title(),
             bases=[ast.Name(id="TestCase", ctx=ast.Load())],
             keywords=[],
-            starargs=None,
             kwargs=None,
             body=list(body),
             decorator_list=[],
@@ -91,7 +91,7 @@ class ExampleTransformer(ast.NodeTransformer):
             (withitem,) = node.items
             context_expr = withitem.context_expr
 
-            name = context_expr.args[0].s
+            name = context_expr.args[0].value
             context_var = withitem.optional_vars.id
 
             yield self.transform_example(node, name, context_var, group_var)

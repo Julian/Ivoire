@@ -7,9 +7,10 @@ ROOT = Path(__file__).parent
 DOCS = ROOT / "docs"
 IVOIRE = ROOT / "ivoire"
 
-SUPPORTED = ["3.8", "3.9", "3.10", "3.11", "3.12", "pypy3.10"]
-LATEST = "3.12"
+SUPPORTED = ["pypy3.11", "3.12", "3.13", "3.14"]
+LATEST = SUPPORTED[-1]
 
+nox.options.default_venv_backend = "uv|virtualenv"
 nox.options.sessions = []
 
 
@@ -32,23 +33,20 @@ def tests(session):
     session.run("ivoire", IVOIRE)
 
 
-@session()
-def audit(session):
-    """
-    Audit dependencies for vulnerabilities.
-    """
-    session.install("pip-audit", ROOT)
-    session.run("python", "-m", "pip_audit")
-
-
 @session(tags=["build"])
 def build(session):
     """
     Build a distribution suitable for PyPI and check its validity.
     """
-    session.install("build", "twine")
+    session.install("build[uv]", "twine")
     with TemporaryDirectory() as tmpdir:
-        session.run("python", "-m", "build", ROOT, "--outdir", tmpdir)
+        session.run(
+            "pyproject-build",
+            "--installer=uv",
+            ROOT,
+            "--outdir",
+            tmpdir,
+        )
         session.run("twine", "check", "--strict", tmpdir + "/*")
 
 
@@ -66,5 +64,5 @@ def typing(session):
     """
     Check static typing.
     """
-    session.install("mypy", str(ROOT))
-    session.run("python", "-m", "mypy", str(IVOIRE))
+    session.install("mypy", ROOT)
+    session.run("python", "-m", "mypy", IVOIRE)

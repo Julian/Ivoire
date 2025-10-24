@@ -1,6 +1,7 @@
 """
 Standalone mode for Ivoire.
 """
+
 from unittest import SkipTest, TestCase
 import sys
 

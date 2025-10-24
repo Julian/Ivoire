@@ -10,6 +10,7 @@ Globals defined in this module:
     __version__: The current version information
 
 """
+
 from importlib import metadata
 
 from ivoire.manager import ContextManager

@@ -8,7 +8,6 @@ by the surrounding test case.
 
 """
 
-
 from unittest import TestCase
 import sys
 
